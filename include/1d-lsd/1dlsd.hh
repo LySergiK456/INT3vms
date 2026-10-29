@@ -1,78 +1,62 @@
-#include <list>
 #include <map>
 #include <memory>
 #include <vector>
 extern "C" {
     #include "../types.h"
+    #include "./binary.h"
+    #include "./1dlsd.h"
 };
+#include "./linux/assid.hh"
+#include "./binary.hh"
 #include "../common/mem.hh"
-#include "../pe64/pe64.hh"
-#include "../pe64/pe64_c_api.hh"
+#include "../syx86/syx86.hh"
+#include <unicorn/unicorn.h>
 
 #ifndef _1DLSD_HH
 #define _1DLSD_HH
 #include "../../x86disass/disass.hpp"
+#include "../common/utils.hh"
 
 extern "C" {
+    #include "./yayo.h"
     #include "./1dlsd.h"
-    #include "./rel_yayo.h"
 };
 
 namespace SlitYaX86 {
-class _1Dlsd;
-struct lsd_pass {
-    Util::MMap_t<lsd_oper_cb> op_callbacks;
-
-  protected:
-    _1Dlsd *lsd{nullptr};
-
-  public:
-    lsd_pass() = default;
-
-    virtual LSD_STATUS _init_(_1Dlsd *lsd) {
-        return LSD_OK;
-    }
-
-
-    friend class _1Dlsd;
+    class _1Dlsd;
+    class x1Dlsd;   // Linux packer
+    #if defined(__linux__)
+        class ElfObj;
+    #endif
 };
-};
-
-using IMG_DOS_HEADER        = IMAGE_DOS_HEADER;
-using IMG_NT_HEADERS        = IMAGE_NT_HEADERS;
-using IMG_DATA_DIRECTORY    = IMAGE_DATA_DIRECTORY;
-using IMG_SECTION_HEADER    = IMAGE_SECTION_HEADER;
-
-constexpr __u64 IMG_DIR_EXPORT        = IMAGE_DIRECTORY_ENTRY_EXPORT;
-constexpr __u64 IMG_DIR_IMPORT        = IMAGE_DIRECTORY_ENTRY_IMPORT;
-constexpr __u64 IMG_DIR_RESOURCE      = IMAGE_DIRECTORY_ENTRY_RESOURCE;
-constexpr __u64 IMG_DIR_EXCEPTION     = IMAGE_DIRECTORY_ENTRY_EXCEPTION;
-constexpr __u64 IMG_DIR_SECURITY      = IMAGE_DIRECTORY_ENTRY_SECURITY;
-constexpr __u64 IMG_DIR_BASERELOC     = IMAGE_DIRECTORY_ENTRY_BASERELOC;
-constexpr __u64 IMG_DIR_DEBUG         = IMAGE_DIRECTORY_ENTRY_DEBUG;
-constexpr __u64 IMG_DIR_ARCHITECTURE  = IMAGE_DIRECTORY_ENTRY_ARCHITECTURE;
-constexpr __u64 IMG_DIR_GLOBALPTR     = IMAGE_DIRECTORY_ENTRY_GLOBALPTR;
-constexpr __u64 IMG_DIR_TLS           = IMAGE_DIRECTORY_ENTRY_TLS;
-constexpr __u64 IMG_DIR_LOAD_CONFIG   = IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG;
-constexpr __u64 IMG_DIR_BOUND_IMPORT  = IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT;
-constexpr __u64 IMG_DIR_IAT           = IMAGE_DIRECTORY_ENTRY_IAT;
-constexpr __u64 IMG_DIR_DELAY_IMPORT  = IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT;
-constexpr __u64 IMG_DIR_COM_DESCRIPTOR= IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR;
 
 namespace SlitYaX86 {
 struct Lyss {
+    struct {
+        x1Dlsd  *nix_lsd;
+        _1Dlsd  *____lsd;
+    };
+    Binary_t&               bin;
 private:
-    std::vector<void*>    tofree;
+    std::vector<void*>      tofree;
 public:
-    _1Dlsd          *lsd;
-    pe64_image      &base_img;
+    std::map<struct _1Dlsd_entry, struct rel_yayo>  m_yayo_entry;
+    std::map<__u64, struct _1Dlsd_entry>            map;
 
-    std::map<__u64, struct _1Dlsd_entry>    map;
-    Lyss&           self{*this};
+    /**
+     * Linux    */
+    Lyss() = delete;
+    Lyss(_1Dlsd *dlsd, Binary_t& _bin) : ____lsd{dlsd}, bin{_bin} {}
+    Lyss(x1Dlsd *dlsd, Binary_t& _bin) : nix_lsd{dlsd}, bin{_bin} {}
+    virtual ~Lyss() {
+        for (auto& e : tofree) delete e;
+    }
 
-    Lyss(_1Dlsd *l, pe64_image &_pe);
-    virtual ~Lyss();
-    Generic(T) void push(pe64_image *img, enum _1DLSD_TYPE t, T &v) {
+    Generic(T) void push_ptr(Binary_t *img, enum _1DLSD_TYPE t, T *v) {
+        tofree.push_back((void*)v);
+        return push(img, t, *v);
+    }
+    Generic(T) void push(Binary_t *img, enum _1DLSD_TYPE t, T &v) {
         map[v.off] = (struct _1Dlsd_entry){
             .t = t, .mm = &v.mm, .src = {img, v.off, v.mm.sz}};
     }
@@ -93,39 +77,64 @@ public:
 
         return i;
     }
-    std::map<__u64, struct _1Dlsd_entry> &operator()() { return map; }
-    __u64 get_size(enum _1DLSD_TYPE &t) {
-        __u64 v = 0;
-        switch (t) {
-            case DosHdr: v = sizeof(IMG_DOS_HEADER);     break;
-            case NtHdrs: v = sizeof(IMG_NT_HEADERS);     break;
-            case DataDir:v = sizeof(IMG_DATA_DIRECTORY); break;
-            case Section:v = sizeof(IMG_SECTION_HEADER); break;
-        }
-        return v;
-    }
 
-    pe64_hdr_t *&operator<<(pe64_hdr_t&& v) {
-        auto v_ptr = new pe64_hdr_t;
-        *v_ptr = std::move(v);
-        tofree.push_back(reinterpret_cast<void*>(v_ptr));
-        return reinterpret_cast<pe64_hdr_t*&>(tofree.back());
-    }
+    std::map<__u64, struct _1Dlsd_entry> &operator()();
+    bin_hdr_t *&operator<<(bin_hdr_t&& v);
+    virtual __u64 get_size(enum _1DLSD_TYPE &t) {};
 
-    void AlignHeaders(__u64 off, __u64 sz);
-private:
-    void ChopSections();
-    void ChopSegments();
+protected:
+    void SliceSegments();
+
+    friend class _1Dlsd;
+};
 };
 
-class _1Dlsd : public _1Dlsd_st {
-    Disass          d;
-    lsd_pass        &pass;
-    Lyss            lyss;
+namespace SlitYaX86 {
+    struct acid_pass {
+        Util::MMap_t<lsd_oper_calback> op_callbacks;
+      protected:
+        _1Dlsd *lsd{nullptr};
 
+      public:
+        acid_pass() = default;
+        virtual LSD_STATUS _init_(_1Dlsd *lsd) { return LSD_OK; }
+        friend class _1Dlsd;
+    };
+};
+
+namespace SlitYaX86 {
+class _1Dlsd : public _1Dlsd_pack_t {
+    Disass          d;
+    acid_pass&      pass;
+    Lyss            *lyss;
   public:
-    _1Dlsd(pe64_image &base_img, lsd_pass &_p);
+    _1Dlsd(Lyss *_lyss, acid_pass& _pass)
+        : lyss{_lyss}, pass{_pass}, _1Dlsd_pack_t{0}
+    {
+        llist_init(&ll_px,    sizeof(struct _1Dlsd_entry));
+        llist_init(&ll_rel,   sizeof(struct rel_yayo));
+        llist_init(&ll_cb,    sizeof(struct lsd_oper_cb));
+    };
+    virtual ~_1Dlsd() = default;
+
+    template<enum _1DLSD_TYPE T, typename Fn>
+    void parse(Fn fn) {
+        for (auto& [off, e] : lyss->map)
+            if (e.t == T) fn(off, e);
+    }
+
+    void run() {
+        lyss->SliceSegments();
+        pass._init_(this);
+    }
+
+    bool insert(Binary_t *bin, enum _1DLSD_TYPE t, bin_hdr_t *e) {
+
+    }
     __s8 make(char *f);
 };
 };
+
+LSD_API __u64 lsd_align(struct rel_yayo *ctx, __u64 offset);
 #endif
+

@@ -1,10 +1,8 @@
 #include "../common/mem.hh"
-#include "../pe64/pe64.hh"
 #include "../conf.hh"
 
 #ifndef KRACK_SYX86_GUARD
 #define KRACK_SYX86_GUARD
-#include "./loader/windows/win_ldr.hh"
 #endif
 #include "./uc.hh"
 #include <list>
@@ -15,7 +13,7 @@
 #include "../../x86disass/disass.hpp"
 extern "C" {
     #include "../types.h"
-    #include "./syscall/win_syscall.h"
+    #include "./syscall/windows/win_syscall.h"
     #include "./dex/dex.h"
 };
 
@@ -28,7 +26,6 @@ namespace SlitYaX86 {
     template<class TLdr, class TDex> class Razor;
 };
 
-
 namespace SlitYaX86 {
     enum class SyscallHook : __u8
     {
@@ -36,6 +33,20 @@ namespace SlitYaX86 {
         PostHook= 2,
     };
 };
+
+namespace SlitYaX86 {
+    class Ldr;
+    
+    namespace Memory {
+        template<typename T>
+        struct syx_retn_t {
+            T       v;
+            uc_err  err;
+        };
+    };
+};
+#define SYX_RETN(T) syx_retn_t<T>
+#define SYX_MEM_API
 
 namespace SlitYaX86 {
 class Ldr {
@@ -60,12 +71,13 @@ public:
         assert(0);
     }
 
+    shadow_mem_t *VAtoShadow(__u64 virt);
+
 private:
     void virt_map_fxd(__u64 addr, __u64 size, __u32 prot);
     uc_err uc_map_fxd(__u64 addr, __u64 size, __u32 prot);
 
 public:
-    virtual shadow_mem_t *VAtoShadow(__u64 virt) = 0;
     __u64 AllocUcStr(char *str);
     __u64 AllocUcStr(wchar_t *wstr);
     /** uc~mappings 2 Sh4d0w mappings
@@ -114,7 +126,7 @@ namespace SlitYaX86 {
         Razor(int argc, char **argv);
         Razor &operator=(Razor &&r) = default;
 
-        virtual uc_err Run() { return UC_ERR_NOMEM; }
+        virtual uc_err Run() { return ldr.Run(); }
     };
 
     // template<typename TLdr, typename TDex>

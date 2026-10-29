@@ -1,3 +1,4 @@
+#include <unicorn/unicorn.h>
 #include "../types.h"
 
 #ifndef KRACK_UTILS_H
@@ -21,10 +22,12 @@ extern "C" {
 #endif
 
 const char *strerr(perr_t err);
+uc_err _uc_init_x86_64_(uc_engine **uc);
 void *xmalloc(__u64 size);
 __u32 FileExists(char *file);
 __u32 DirExists(char *dir);
 void hexdump(void *addr, __u64 sz);
+__u64 ptrArrSize(char **x);
 int __wr_init(void *addr, __u64 size, __u32 *dw);
 int __wr_exit(void *addr, __u64 size, __u32 perm);
 int _write_mem(void *dst, void *src, __u64 size);

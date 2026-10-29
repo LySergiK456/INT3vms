@@ -1,17 +1,21 @@
+#ifndef KRACK_TYPES_H
+#define KRACK_TYPES_H
+#if defined(__linux__)
+#include <linux/types.h>
+#endif
+#if defined(_WIN32)
 #include <ntdef.h>
 #include <windows.h>
 
-#ifndef KRACK_TYPES_H
-#define KRACK_TYPES_H
-typedef unsigned long long __u64;
-typedef unsigned int __u32;
-typedef unsigned short __u16;
-typedef unsigned char __u8;
+typedef unsigned long long  __u64;
+typedef unsigned int        __u32;
+typedef unsigned short      __u16;
+typedef unsigned char       __u8;
 
-typedef long long __s64;
-typedef int __s32;
-typedef short __s16;
-typedef char __s8;
+typedef long long   __s64;
+typedef int         __s32;
+typedef short       __s16;
+typedef char        __s8;
 
 typedef struct {
     __u16 Length;
@@ -211,4 +215,5 @@ typedef struct {
     __u8 TestRetInstruction;
     __u8 _padding0[0x2F8];
 } _KUSER_SHARED_DATA_;
+#endif
 #endif

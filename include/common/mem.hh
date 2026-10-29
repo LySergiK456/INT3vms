@@ -1,7 +1,8 @@
+#include <string.h>
+#include <assert.h>
 #include "../types.h"
 #include "./utils.h"
 #include "./mem.h"
-#include <assert.h>
 
 #ifndef KRACK_MEM_HH
 #define KRACK_MEM_HH
@@ -19,6 +20,11 @@ struct mem_map_t {
             memcpy(name, _name, strlen(_name) + 1);
         }
     }
+};
+enum MemPerm {
+    PAGE_READ,
+    PAGE_EXEC,
+    PAGE_WRITE,
 };
 
 struct shadow_mem_t {
@@ -41,7 +47,8 @@ struct shadow_mem_t {
     }
 
     bool IsW() {
-        return perm & PAGE_EXECUTE_READWRITE || perm & PAGE_READWRITE;
+        // return perm & PAGE_EXECUTE_READWRITE || perm & PAGE_READWRITE;
+        return perm & PAGE_EXEC;
     }
 };
 #endif

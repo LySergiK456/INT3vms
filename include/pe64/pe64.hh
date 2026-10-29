@@ -1,3 +1,6 @@
+#ifndef KRACK_PE64_HH
+#define KRACK_PE64_HH
+
 #include "../conf.hh"
 #include <fileapi.h>
 #include <stdio.h>
@@ -12,9 +15,6 @@ extern "C" {
 };
 #include <list>
 #include <memory>
-
-#ifndef KRACK_PE64_HH
-#define KRACK_PE64_HH
 
 #define _DATA_DIR_ST(T, name)                                                  \
     struct {                                                                   \

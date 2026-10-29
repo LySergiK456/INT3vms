@@ -9,40 +9,40 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_G | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x01,
         .reg_op = 'r',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_G | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x02,
         .reg_op = 'r',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_G | F_OPER_B}, {.f = F_ADDR_E | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x03,
         .reg_op = 'r',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_G | F_OPER_V}, {.f = F_ADDR_E | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x04,
         .mnemonic = "ADD",
         .op = {{.reg = "AL"}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x05,
         .mnemonic = "ADD",
         .op = {{.reg = "eAX"}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x06,
@@ -111,40 +111,40 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_G | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x11,
         .reg_op = 'r',
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_G | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x12,
         .reg_op = 'r',
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_G | F_OPER_B}, {.f = F_ADDR_E | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x13,
         .reg_op = 'r',
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_G | F_OPER_V}, {.f = F_ADDR_E | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x14,
         .mnemonic = "ADC",
         .op = {{.reg = "AL"}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x15,
         .mnemonic = "ADC",
         .op = {{.reg = "eAX"}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x16,
@@ -161,40 +161,40 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_G | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x19,
         .reg_op = 'r',
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_G | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x1A,
         .reg_op = 'r',
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_G | F_OPER_B}, {.f = F_ADDR_E | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x1B,
         .reg_op = 'r',
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_G | F_OPER_V}, {.f = F_ADDR_E | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x1C,
         .mnemonic = "SBB",
         .op = {{.reg = "AL"}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x1D,
         .mnemonic = "SBB",
         .op = {{.reg = "eAX"}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x1E,
@@ -260,40 +260,40 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_G | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x29,
         .reg_op = 'r',
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_G | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x2A,
         .reg_op = 'r',
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_G | F_OPER_B}, {.f = F_ADDR_E | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x2B,
         .reg_op = 'r',
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_G | F_OPER_V}, {.f = F_ADDR_E | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x2C,
         .mnemonic = "SUB",
         .op = {{.reg = "AL"}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x2D,
         .mnemonic = "SUB",
         .op = {{.reg = "eAX"}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .prefix = 0x2E,
@@ -364,40 +364,40 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_G | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x39,
         .reg_op = 'r',
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_G | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x3A,
         .reg_op = 'r',
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_G | F_OPER_B}, {.f = F_ADDR_E | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x3B,
         .reg_op = 'r',
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_G | F_OPER_V}, {.f = F_ADDR_E | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x3C,
         .mnemonic = "CMP",
         .op = {{.reg = "AL"}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x3D,
         .mnemonic = "CMP",
         .op = {{.reg = "eAX"}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .prefix = 0x3E,
@@ -419,14 +419,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .flds = 1,
         .mnemonic = "INC",
         .op = {{.f = F_ADDR_Z | F_OPER_V}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Increment by 1 */
     {
         .opcode1 = 0x48,
         .flds = 1,
         .mnemonic = "DEC",
         .op = {{.f = F_ADDR_Z | F_OPER_V}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Decrement by 1 */
     {
         .opcode1 = 0x50,
@@ -525,7 +525,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
                {.f = F_ADDR_E | F_OPER_V},
                {.f = F_ADDR_I | F_OPER_V},
                0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Multiply */
     {
         .opcode1 = 0x6A,
@@ -540,7 +540,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
                {.f = F_ADDR_E | F_OPER_V},
                {.f = F_ADDR_I | F_OPER_BS},
                0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Multiply */
     {
         .opcode1 = 0x6C,
@@ -875,7 +875,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = '0',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x80,
@@ -888,14 +888,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 2,
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x80,
         .reg_op = 3,
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x80,
@@ -908,7 +908,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 5,
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x80,
@@ -921,14 +921,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 7,
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x81,
         .reg_op = '0',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x81,
@@ -941,14 +941,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 2,
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x81,
         .reg_op = 3,
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x81,
@@ -961,7 +961,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 5,
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x81,
@@ -974,14 +974,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 7,
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x82,
         .reg_op = '0',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x82,
@@ -994,14 +994,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 2,
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x82,
         .reg_op = 3,
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x82,
@@ -1014,7 +1014,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 5,
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x82,
@@ -1027,14 +1027,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 7,
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_I | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x83,
         .reg_op = '0',
         .mnemonic = "ADD",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_BS}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add */
     {
         .opcode1 = 0x83,
@@ -1047,14 +1047,14 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 2,
         .mnemonic = "ADC",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_BS}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Add with Carry */
     {
         .opcode1 = 0x83,
         .reg_op = 3,
         .mnemonic = "SBB",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_BS}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Integer Subtraction with Borrow */
     {
         .opcode1 = 0x83,
@@ -1067,7 +1067,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 5,
         .mnemonic = "SUB",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_BS}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Subtract */
     {
         .opcode1 = 0x83,
@@ -1080,7 +1080,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 7,
         .mnemonic = "CMP",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_I | F_OPER_BS}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Compare Two Operands */
     {
         .opcode1 = 0x84,
@@ -3465,21 +3465,21 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 3,
         .mnemonic = "NEG",
         .op = {{.f = F_ADDR_E | F_OPER_B}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Two's Complement Negation */
     {
         .opcode1 = 0xF6,
         .reg_op = 4,
         .mnemonic = "MUL",
         .op = {{.reg = "AX"}, {.reg = "AL"}, {.f = F_ADDR_E | F_OPER_B}, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Unsigned Multiply */
     {
         .opcode1 = 0xF6,
         .reg_op = 5,
         .mnemonic = "IMUL",
         .op = {{.reg = "AX"}, {.reg = "AL"}, {.f = F_ADDR_E | F_OPER_B}, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Multiply */
     {
         .opcode1 = 0xF6,
@@ -3489,7 +3489,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
                {.reg = "AH"},
                {.reg = "AX"},
                {.f = F_ADDR_E | F_OPER_B}},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Unsigned Divide */
     {
         .opcode1 = 0xF6,
@@ -3499,7 +3499,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
                {.reg = "AH"},
                {.reg = "AX"},
                {.f = F_ADDR_E | F_OPER_B}},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Divide */
     {
         .opcode1 = 0xF7,
@@ -3524,35 +3524,35 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 3,
         .mnemonic = "NEG",
         .op = {{.f = F_ADDR_E | F_OPER_V}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Two's Complement Negation */
     {
         .opcode1 = 0xF7,
         .reg_op = 4,
         .mnemonic = "MUL",
         .op = {{.reg = "eDX"}, {.reg = "eAX"}, {.f = F_ADDR_E | F_OPER_V}, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Unsigned Multiply */
     {
         .opcode1 = 0xF7,
         .reg_op = 5,
         .mnemonic = "IMUL",
         .op = {{.reg = "eDX"}, {.reg = "eAX"}, {.f = F_ADDR_E | F_OPER_V}, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Multiply */
     {
         .opcode1 = 0xF7,
         .reg_op = 6,
         .mnemonic = "DIV",
         .op = {{.reg = "eDX"}, {.reg = "eAX"}, {.f = F_ADDR_E | F_OPER_V}, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Unsigned Divide */
     {
         .opcode1 = 0xF7,
         .reg_op = 7,
         .mnemonic = "IDIV",
         .op = {{.reg = "eDX"}, {.reg = "eAX"}, {.f = F_ADDR_E | F_OPER_V}, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Divide */
     {
         .opcode1 = 0xF8,
@@ -3589,28 +3589,28 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = '0',
         .mnemonic = "INC",
         .op = {{.f = F_ADDR_E | F_OPER_B}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Increment by 1 */
     {
         .opcode1 = 0xFE,
         .reg_op = 1,
         .mnemonic = "DEC",
         .op = {{.f = F_ADDR_E | F_OPER_B}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Decrement by 1 */
     {
         .opcode1 = 0xFF,
         .reg_op = '0',
         .mnemonic = "INC",
         .op = {{.f = F_ADDR_E | F_OPER_V}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Increment by 1 */
     {
         .opcode1 = 0xFF,
         .reg_op = 1,
         .mnemonic = "DEC",
         .op = {{.f = F_ADDR_E | F_OPER_V}, 0, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Decrement by 1 */
     {
         .opcode1 = 0xFF,
@@ -7557,7 +7557,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "IMUL",
         .op = {{.f = F_ADDR_G | F_OPER_V}, {.f = F_ADDR_E | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, ARITH, BINARY),
+        .grp = GRP(GEN, ARITH, Binary),
     }, /* desc=Signed Multiply */
     {
         .two_byte = 0x0f,
@@ -7568,7 +7568,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
                {.reg = "AL"},
                {.f = F_ADDR_G | F_OPER_B},
                0},
-        .grp = GRP(GEN, DATAMOV_ARITH, BINARY),
+        .grp = GRP(GEN, DATAMOV_ARITH, Binary),
     }, /* desc=Compare and Exchange */
     {
         .two_byte = 0x0f,
@@ -7579,7 +7579,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
                {.reg = "eAX"},
                {.f = F_ADDR_G | F_OPER_V},
                0},
-        .grp = GRP(GEN, DATAMOV_ARITH, BINARY),
+        .grp = GRP(GEN, DATAMOV_ARITH, Binary),
     }, /* desc=Compare and Exchange */
     {
         .two_byte = 0x0f,
@@ -7722,7 +7722,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "XADD",
         .op = {{.f = F_ADDR_E | F_OPER_B}, {.f = F_ADDR_G | F_OPER_B}, 0, 0},
-        .grp = GRP(GEN, DATAMOV_ARITH, BINARY),
+        .grp = GRP(GEN, DATAMOV_ARITH, Binary),
     }, /* desc=Exchange and Add */
     {
         .two_byte = 0x0f,
@@ -7730,7 +7730,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 'r',
         .mnemonic = "XADD",
         .op = {{.f = F_ADDR_E | F_OPER_V}, {.f = F_ADDR_G | F_OPER_V}, 0, 0},
-        .grp = GRP(GEN, DATAMOV_ARITH, BINARY),
+        .grp = GRP(GEN, DATAMOV_ARITH, Binary),
     }, /* desc=Exchange and Add */
     {
         .two_byte = 0x0f,
@@ -7871,7 +7871,7 @@ const instr x86_tabl[1031] = (const instr[1031]){
         .reg_op = 1,
         .mnemonic = "CMPXCHG8B",
         .op = {{.f = F_ADDR_M | F_OPER_Q}, {.reg = "EAX"}, {.reg = "EDX"}, 0},
-        .grp = GRP(GEN, DATAMOV_ARITH, BINARY),
+        .grp = GRP(GEN, DATAMOV_ARITH, Binary),
     }, /* desc=Compare and Exchange Bytes */
     {
         .two_byte = 0x0f,

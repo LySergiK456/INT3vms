@@ -21,7 +21,7 @@ public:
 
     Dex() = default;
     Dex(Dex &&x) = default;
-    Dex(Razor<WinDex, WinLdr> *_r) : r{_r} {}//, ctx{DexVerse::newDexCtx()} {}
+    Dex(Razor<WinDex, WinLdr> *_r) : r{_r} {}
 };
 };
 
@@ -34,8 +34,13 @@ namespace SlitYaX86::DexVerse {
 namespace SlitYaX86
 {
 struct WinDex : public Dex {
-    WinDex(Razor<WinDex, WinLdr> *_r)
-        : Dex(r) {}
+    WinDex(Razor<WinDex, WinLdr> *razor)
+        : Dex(razor)
+    {
+        
+        ctx = DexVerse::newDexCtx();
+        DexVerse::addDexSource(ctx, razor->ldr.proc.peb_addr, sizeof(_PEB_));
+    }
 
     static void syscall_hook(SyscallHook t, const char *name, void *fn);
     static void hook_code(uc_engine *uc, __u64 addr, __u64 i, void *raw_ctx);

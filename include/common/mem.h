@@ -1,7 +1,8 @@
-#include <fileapi.h>
-#include <windows.h>
-#include <winternl.h>
+#include <unicorn/unicorn.h>
 #include "../types.h"
+
+#define BINARY_ELF64    1
+#define BINARY_PE32CC   2
 
 #ifndef KRACK_MEM_H
 #define KRACK_MEM_H
@@ -39,6 +40,8 @@ enum X86OperType
 #define PAGE_MASK           (PAGE_SIZE - 1)
 #define PAGE_ALIGN_UP(x)    (((__u64)((x)) + PAGE_MASK) & ~PAGE_MASK)
 #define PAGE_ALIGN_DOWN(x)  ((__u64)((x)) & ~PAGE_MASK)
+#define ALIGN_UP(x, align)  (((__u64)((x)) + ((align)-1)) & ~((align)-1))
+
 
 #define IA32_FS_BASE    0xC0000100ULL
 #define IA32_GS_BASE    0xC0000101ULL

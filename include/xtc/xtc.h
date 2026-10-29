@@ -25,6 +25,16 @@ typedef struct {
     __u64 count;
 } xtc_ehdr;
 
+struct xtc_px {
+    union {
+        __u64 orig_off;
+        __u64 VirtualAddress;
+    };
+    instr *tabl_insn;
+    __u8 sc[15];
+    __u8 size;
+};
+
 struct xtc_oper {
     enum x86_op_type t;
     __u32 size;

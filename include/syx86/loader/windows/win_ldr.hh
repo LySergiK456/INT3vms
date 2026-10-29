@@ -12,11 +12,11 @@
 #include "../../dex/dex.hh"
 extern "C" {
     #include "../../../types.h"
-    #include "../../syscall/win_syscall.h"
+    #include "../../syscall/windows/win_syscall.h"
     #include "../../dex/dex.h"
 };
-#ifndef KRACK_WIN_LDR_HH
-#define KRACK_WIN_LDR_HH
+#ifndef SYX86_WIN_LDR_HH
+#define SYX86_WIN_LDR_HH
 
 namespace SlitYaX86 {
     __attribute__((constructor)) void init_wine_syscalls();
@@ -48,7 +48,6 @@ public:
     uc_err Run();
 
     std::shared_ptr<PE64_IMAGE> VAtoImage(__u64 va);
-    shadow_mem_t *VAtoShadow(__u64 virt) override;
 
     void addLdrEntry(std::shared_ptr<PE64_IMAGE> dll_img);
     void addLdrEntry(__u64 virt, char *basename, char *fullname);

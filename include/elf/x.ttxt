@@ -1,0 +1,39 @@
+// mmelfx64_each_dynamic(this, dyn) {
+        //     switch (dyn->d_tag) {
+        //     case DT_NEEDED:
+        //         llist_push(&ll_libs, &self->strtab[dyn->d_un.d_ptr]);
+        //         break;
+        //     case DT_PLTRELSZ:   break;//pltrel sz
+        //     case DT_PLTREL:     break;//pltrel
+        //     case DT_PLTGOT:     break;//plt and or got
+        //     case DT_STRTAB:     break;//strtab
+        //     case DT_SYMTAB:     break;//symtab
+        //     case DT_STRSZ:      break;//strtab size
+        //     case DT_SYMENT:     break;// symbol entry size
+        //     case DT_INIT:       break;  // init
+        //     case DT_FINI:       break;  // fini
+        //     case DT_SONAME:     break;//strtab off to name of shared object
+        //     case DT_SYMBOLIC:   break;// look at me before look into main exe for symbols
+
+        //     case DT_REL:        break;
+        //     case DT_RELSZ:      break;
+        //     case DT_RELENT:     break;
+
+        //     case DT_RELA:       break;
+        //     case DT_RELASZ:     break;
+        //     case DT_RELAENT:    break;
+
+        //     case DT_TEXTREL:    break;
+        //     case DT_HASH:       break;
+
+        //     case DT_JMPREL:     break;  // pllt
+        //     case DT_BIND_NOW:   break;  //  Instruct dynamic linker to process all relocations before transferring control to the executable
+
+        //     case DT_RPATH:
+        //     case DT_RUNPATH:    break;  // library search path
+
+        //     case DT_VERNEED:
+        //     case DT_VERNEEDNUM:
+        //     case DT_VERSYM:    
+        //     }
+        // }

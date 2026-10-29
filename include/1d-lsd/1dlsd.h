@@ -1,13 +1,11 @@
-#include "../pe64/pe64.h"
-#include "../common/llist.h"
 #include "../types.h"
-#include "./rel_yayo.h"
-#include <windows.h>
+#include "../common/llist.h"
+#include "./binary.h"
+#include "../../x86disass/include/disass.h"
 
-#ifndef _1DLSD_H
-#define _1DLSD_H
+#ifndef LSD_API_H
+#define LSD_API_H
 #define LSD_API
-
 typedef unsigned long long LSD_STATUS;
 
 enum LSD_STATUS_COdE {
@@ -15,86 +13,54 @@ enum LSD_STATUS_COdE {
     LSD_NULLPTR,
 };
 
-enum _1DLSD_IMAGE_TYPE {
-    EXE = IMAGE_FILE_EXECUTABLE_IMAGE,
-    DLL = IMAGE_FILE_EXECUTABLE_IMAGE | IMAGE_FILE_DLL,
+enum _1DLSD_bin_tYPE {
+    LSD_None    = 0,
+    LSD_ELF32   = 1,
+    LSD_ELF64   = 2,
+    LSD_PE32    = 3
+};
+enum _1DLSD_TYPE {
+    LSD_R   = 0x100,
+    LSD_RW  = 0x200,
+    LSD_RX  = 0x400,
+    LSD_RWX = 0x700,
+    LSD_NONE= 0,
+    Ehdr,
+    Phdr,
+    Shdr,
+    Rela,
+    Rel,
+    Sym,
+    Dyn,
+    GNU_Verneed,
+    GNU_Versym,
 };
 
-enum _1DLSD_TYPE {
-    NullHdr = 0x0,
-    PAGE_R = 0x100,
-    PAGE_RW = 0x200,
-    PAGE_RX = 0x400,
-    PAGE_RWX = 0x700,
-    DosHdr = 0x10,
-    DosStub = 0x20,
-    NtHdrs = 0x30,
-    // Sign	= 0x100,
-    // FileHdr	= 0x200,
-    // OptHdr	= 0x400,
-    SecHdr = 0x40,
-    Section = 0x50,
-    DataDir = 0x60,
-    DataDirExport,
-    DataDirImport,
-    DataDirRsrc,
-    DataDirExcept,
-    DataDirSec,
-    DataDirReloc,
-    DataDirDbg,
-    DataDirArch,
-    DataDirGlobalPtr,
-    DataDirTLS,
-    DataDirLoadConf,
-    DataDirBoundImp,
-    DataDirIAT,
-    DataDirDelayImp,
-    DataDirComDesc,
-    DataDirReserved,
-    SEC_text,
-    SEC_data,
-    SEC_rdata,
-    SEC_bss,
-    SEC_idata,
-    SEC_edata,
-    SEC_reloc,
-    SEC_rsrc,
-    SEC_tls,
-    SEC_pdata,
-    SEC_xdata,
-    SEC_debug,
-    SEC_CRT,
-    SEC_gfids,
-    SEC_didat,
-    SEC_sxdata,
-    SEC_00cfg,
-    SEC_gehcont,
-    SEC_orpc,
-    SEC_arch,
-    SEC_drectve,
-};
-typedef int(*lsd_oper_calback)(instr_dat_t *insn, __u64 i, __u64 imm, instr_dat_t *out);
+typedef int (*lsd_oper_calback)(instr_dat_t *insn, __u64 i, __u64 imm, instr_dat_t *out);
 
 struct lsd_oper_cb {
-    pe64_image          *lsd_img;
+    bin_t			*lsd_img;
     lsd_oper_calback    lsd_cb;
     operand             lsd_oper;
 };
 
 struct _1Dlsd_entry {
-    _1DLSD_TYPE t;
-    mm_t *mm;
+    enum _1DLSD_TYPE    t;
+    mm_t                *mm;
     struct {
-        pe64_image *img;
-        __u64 off, sz;
+        bin_t       *img;
+        __u64       off, sz;
     } src;
     struct {
-        __u64 off, sz;
+        __u64      off, sz;
     } dst;
 };
 
-struct _1Dlsd_st {
-    LLIST_OF(pe64_image *) pImg;
-    LLIST_OF(_1Dlsd_entry) px;
-};
+typedef struct {
+    LLIST_OF(struct _1Dlsd_entry)       ll_px;
+    LLIST_OF(struct rel_yayo)           ll_rel;
+    LLIST_OF(struct lsd_oper_cb)  ll_cb;
+} _1Dlsd_pack_t;
+
+LSD_API __u64 lsd_align(struct rel_yayo *ctx, __u64 offset);
 #endif
