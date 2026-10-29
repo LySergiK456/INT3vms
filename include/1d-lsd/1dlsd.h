@@ -53,6 +53,8 @@ struct _1Dlsd_entry {
     struct {
         __u64      off, sz;
     } dst;
+    void                *raw_mem;
+    LLIST_OF(struct _1Dlsd_entry) px;
 };
 
 typedef struct {

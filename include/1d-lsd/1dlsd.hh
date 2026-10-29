@@ -46,19 +46,26 @@ public:
 
     /**
      * Linux    */
-    Lyss() = delete;
+    Lyss() = default;
     Lyss(_1Dlsd *dlsd, Binary_t& _bin) : ____lsd{dlsd}, bin{_bin} {}
     Lyss(x1Dlsd *dlsd, Binary_t& _bin) : nix_lsd{dlsd}, bin{_bin} {}
     virtual ~Lyss() {
         for (auto& e : tofree) delete e;
     }
 
-    Generic(T) void push_ptr(Binary_t *img, enum _1DLSD_TYPE t, T *v) {
+    LSD_API void push_ptr(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t *&&v) {
         tofree.push_back((void*)v);
-        return push(img, t, *v);
+        push(img, t, *v);
     }
-    Generic(T) void push(Binary_t *img, enum _1DLSD_TYPE t, T &v) {
+    LSD_API void push(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t& v) {
         if (!v.mm.sz) return;
+        for (auto& [off, entry] : map)
+        {
+            if (entry.t != t) continue;
+
+            if (!!_contains_(entry.dst.off, entry.dst.sz, v.off, v.mm.sz))
+                return;
+        }
         map[v.off] = (struct _1Dlsd_entry){
             .t=t, .mm=&v.mm, .src={img, v.off, v.mm.sz}, .dst={v.off, v.mm.sz}
         };
@@ -67,31 +74,59 @@ public:
         return feach(t, nullptr, fn);
     }
     Generic(Fn) int feach(enum _1DLSD_TYPE t, struct _1Dlsd_entry *v, Fn fn) {
-        int i = 0;
+        __u64 i{};
         try {
-            for (auto &[_, e] : map)
+            for (auto& entry : map) {
+                auto& e = std::get<struct _1Dlsd_entry>(entry);
                 if (e.t == t && ++i && !!e.mm) {
                     if (!!v) *v = e;
-                    for (__u64 off = 0, sz = get_size(t); off < e.mm->sz; off += sz) {
-                        fn(static_cast<lambda_arg<decltype(fn)>>(e.mm->mem+off), e);
+                    for (__u64 off = 0, sz = get_size(t); !!sz && off < e.mm->sz; off += sz) {
+                        fn(static_cast<lambda_arg<decltype(fn)>>(e.mm->mem+off), &e);
                     }
                 }
+            }
         } catch (...) {}
-
         return i;
     }
 
-    std::map<__u64, struct _1Dlsd_entry> &operator()();
+    template<typename TablT, typename EntryT>
+    LSD_API void insert(
+        enum _1DLSD_TYPE    t,
+        void                *mem,   // Shellcode, whatever
+        __u64               size,   // size of mem/data
+        TablT               *tab,   // in case of Phdr/Ehdr/Dynamic
+        __u32               nth,    // tab[nth]
+        EntryT*             e)      // the fucking entry
+    {
+        if (llist_empty(&tab->px)) {
+            llist_init(&tab->px, sizeof(struct _1Dlsd_entry));
+        }
+
+        struct _1Dlsd_entry px = {
+            .dst = {
+                .off= nth * sizeof(EntryT),
+                .sz = (!!e) ? sizeof(EntryT) : size
+            },
+            .raw_mem = mem,
+        };
+
+        llist_push((_LL_TYPE_*)&tab->px, &px);
+        align_map(tab->dst.off+px.dst.off, px.dst.sz);
+        align_bin(tab->dst.off+px.dst.off, px.dst.sz);
+    }
+
     bin_hdr_t *&operator<<(bin_hdr_t&& v);
-    virtual __u64 get_size(enum _1DLSD_TYPE &t) {};
+    std::map<__u64, struct _1Dlsd_entry> &operator()();
+    struct _1Dlsd_entry *get_by_type(enum _1DLSD_TYPE t, __u64 off);
 
 protected:
-    void SliceSegments();
+    virtual __u64 get_size(enum _1DLSD_TYPE t) {
+        static_assert("You shall've implemented this!");
+    };
     void align_map(__u64 off, __u64 sz);
-    virtual void align_binary(__u64 off, __u64 sz) {
+    virtual void align_bin(__u64 off, __u64 sz) {
         static_assert("You Should've implement this!");
     }
-    struct _1Dlsd_entry *get_by_type(enum _1DLSD_TYPE t, __u64 off);
 
     friend class _1Dlsd;
     friend class XLyss;
@@ -114,9 +149,9 @@ namespace SlitYaX86 {
 namespace SlitYaX86 {
 class _1Dlsd : public _1Dlsd_pack_t {
     Disass          d;
+public: // sorry.. - NO, this is !FUCKED!
     acid_pass&      pass;
     Lyss            *lyss;
-  public:
     _1Dlsd(Lyss *_lyss, acid_pass& _pass)
         : lyss{_lyss}, pass{_pass}, _1Dlsd_pack_t{0}
     {
@@ -131,15 +166,10 @@ class _1Dlsd : public _1Dlsd_pack_t {
         for (auto& [off, e] : lyss->map)
             if (e.t == T) fn(off, e);
     }
-
     void run() {
-        lyss->SliceSegments();
-        pass._init_(this);
+        static_assert("This is just wrong, Or not");
     }
 
-    bool insert(Binary_t *bin, enum _1DLSD_TYPE t, bin_hdr_t *e) {
-
-    }
     void make(char *f);
 };
 };

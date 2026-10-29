@@ -163,7 +163,8 @@ __s8 ElfObj::load_elf() {
 		goto fail;
 
 	f.size = st.st_size;
-	map = mmap(0, f.size, PROT_READ, MAP_SHARED|MAP_PRIVATE, fd, 0);
+	// MAP_SHARED
+	map = mmap(0, f.size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (!map) goto fail;
 
 	close(fd);

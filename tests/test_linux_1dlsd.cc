@@ -1,3 +1,4 @@
+#include <elf.h>
 #include <memory>
 #include "../include/1d-lsd/linux/assid.hh"
 #include "../include/1d-lsd/binary.h"
@@ -6,7 +7,7 @@
 #include "../include/elf/elf.hh"
 
 namespace SYX = SlitYaX86;
-using LSD = SlitYaX86::_1Dlsd;
+using XLSD = SlitYaX86::x1Dlsd;
 
 #define LSD_X64(x)	Elf64_##x
 #define LSD_X86(x)	Elf32_##x
@@ -15,13 +16,59 @@ struct ObfuscA
 	: SYX::acid_pass
 {
     ObfuscA() = default;
-    LSD_STATUS _init_(LSD *lsd);
+    LSD_STATUS _init_(XLSD *lsd);
 };
 
-LSD_STATUS ObfuscA::_init_(LSD *lsd) {
-	// lsd->insert();
-	lsd->parse<Phdr>([&](__u64 off, struct _1Dlsd_entry& e) {
-		printf("OI!\n");
+static char *SC =
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
+	"\xcc\xcc";
+
+LSD_STATUS ObfuscA::_init_(XLSD *lsd) {
+	// auto phdr_st = lsd->lyss.get_by_type(ELF_Phdr, 0);
+	// assert(!!phdr_st);
+	// lsd->lyss.insert(
+	// 	ELF_Phdr,	// Type
+	// 	(void*)SC,	// The fucking shellcode which shall reide as a Phdr Entry
+	// 	56,			// SizeOf Shellcode
+	// 	phdr_st,	// struct _1Dlsd_entry *
+	// 	0,			// very first of all PHDR's
+	// 	reinterpret_cast<Elf64_Phdr*>(phdr_st->mm->mem)	// Needs the fucking typecasting
+	// );
+	asm("int3");
+	lsd->parse<ELF_Phdr>([&](__u64 off, struct _1Dlsd_entry& e) {
+		auto p = reinterpret_cast<Elf64_Phdr*>(e.mm->mem);
+		switch (p->p_type) {
+		case PT_LOAD:
+		case PT_PHDR:
+		case PT_DYNAMIC:
+		case PT_GNU_PROPERTY:
+		case PT_GNU_EH_FRAME:
+		case PT_GNU_STACK:
+		case PT_GNU_RELRO:		break;
+		default:
+			__u32 perm{};
+			__wr_init(
+				reinterpret_cast<void*>(PAGE_ALIGN_DOWN(p)),
+				PAGE_SIZE,
+				&perm);
+
+			p->p_offset	= 0xdead;
+			p->p_filesz	= 0xbeef;
+			p->p_vaddr	= 0xcafe;
+			p->p_memsz	= 0xacab;
+
+			__wr_exit(
+				reinterpret_cast<void*>(PAGE_ALIGN_DOWN(p)),
+				PAGE_SIZE,
+				perm);
+		break;
+		}
 	});
     return LSD_OK;
 }
@@ -31,8 +78,10 @@ int main(int argc, char **argv) {
 	auto pass = ObfuscA();
 	auto lsd = SYX::x1Dlsd(pass, elf);
 	lsd.run();
-	auto ldr = SYX::UnixLdr(argc-1, &argv[1]);
-	xx(ldr.ok);
+	lsd.make("/tmp/hello.out");
+	// lsd.run();
+	// auto ldr = SYX::UnixLdr(argc-1, &argv[1]);
+	// xx(ldr.ok);
 	
 	// Elf64_Shdr *x_sec{nullptr};
 	// elfx64_each_sh(dynamic_cast<elfobj_t*>(elf.get()), sec) {

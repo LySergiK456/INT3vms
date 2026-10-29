@@ -19,7 +19,7 @@ namespace SlitYaX86
         lyss.push_ptr(
             bin,
             ELF_Ehdr,
-            new_Lyss_entry(
+            new_lyss(
                 elf->mem,
                 0,
                 sizeof(Elf64_Ehdr)));
@@ -30,9 +30,9 @@ namespace SlitYaX86
             lyss.push_ptr(
                 bin,
                 ELF_Phdr,
-                new_Lyss_entry(
+                new_lyss(
                     elf->mem,
-                    elf->ehdr64->e_phoff + (++ph_ndx*sizeof(Elf64_Phdr)),
+                    elf->ehdr64->e_phoff + (ph_ndx++*sizeof(Elf64_Phdr)),
                     sizeof(Elf64_Phdr)));
             /**
              *  We got protections
@@ -45,7 +45,7 @@ namespace SlitYaX86
             lyss.push_ptr(
                 bin,
                 static_cast<enum _1DLSD_TYPE>(perms),
-                new_Lyss_entry(pMem, ph->p_offset, ph->p_filesz));
+                new_lyss(pMem, ph->p_offset, ph->p_filesz));
         }
 
         __u64 sh_ndx{};
@@ -54,15 +54,15 @@ namespace SlitYaX86
             lyss.push_ptr(
                 bin,
                 ELF_Shdr,
-                new_Lyss_entry(
+                new_lyss(
                     pMem,
-                    elf->ehdr64->e_shoff + (++sh_ndx*sizeof(Elf64_Shdr)),
+                    elf->ehdr64->e_shoff + (sh_ndx++*sizeof(Elf64_Shdr)),
                     sizeof(Elf64_Shdr)));
 
             lyss.push_ptr(
                 bin,
                 LSD_NONE,
-                new_Lyss_entry(
+                new_lyss(
                     pMem,
                     sec->sh_offset,
                     ALIGN_UP(sec->sh_size, sec->sh_addralign)));
@@ -71,10 +71,14 @@ namespace SlitYaX86
 };
 
 namespace SlitYaX86 {
-__u64 XLyss::_get_size(enum _1DLSD_TYPE &t) {
+__u64 XLyss::_get_size(enum _1DLSD_TYPE t) {
     auto s = base_elf.get();
     __u64 v = 0;
     switch (t) {
+        case ELF_Ehdr:
+            v = (s->IsX86()) ? sizeof(Elf32_Ehdr)
+            :   (s->IsX64()) ? sizeof(Elf64_Ehdr) : -1;
+            break;
         case ELF_Phdr:
             v = (s->IsX86()) ? sizeof(Elf32_Phdr)
             :   (s->IsX64()) ? sizeof(Elf64_Phdr) : -1;
@@ -103,7 +107,7 @@ __u64 XLyss::_get_size(enum _1DLSD_TYPE &t) {
     return v;
 }
 
-void XLyss::align_binary(__u64 off, __u64 sz) {
+void XLyss::align_bin(__u64 off, __u64 sz) {
     auto e_ehdr = lyss.get_by_type(ELF_Ehdr, 0);
     assert(!!e_ehdr);
 
@@ -111,7 +115,7 @@ void XLyss::align_binary(__u64 off, __u64 sz) {
     if (ehdr->e_shoff > off) ehdr->e_shoff += sz;
     if (ehdr->e_phoff > off) ehdr->e_phoff += sz;
 
-    lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, struct _1Dlsd_entry& e) {
+    lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, struct _1Dlsd_entry *e) {
         if (_contain_(_p->p_offset, _p->p_filesz, off)) {
             _p->p_memsz     += sz;
             _p->p_filesz    += sz;
@@ -121,7 +125,7 @@ void XLyss::align_binary(__u64 off, __u64 sz) {
             _p->p_vaddr     += sz;
         }
     });
-    lyss.feach(ELF_Shdr, [&](Elf64_Shdr *sec, struct _1Dlsd_entry& e) {
+    lyss.feach(ELF_Shdr, [&](Elf64_Shdr *sec, struct _1Dlsd_entry *e) {
         if (_contain_(sec->sh_offset, sec->sh_size, off)) {
             sec->sh_size    += sz;
         } else if (sec->sh_offset >= off) {

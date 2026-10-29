@@ -54,6 +54,12 @@ enum X86OperType
 #define _contain_(a, sz, b)                                                    \
     ((__u64)(a) <= (__u64)(b) && (__u64)(b) < (__u64)(a) + (__u64)(sz))
 
+#define _contains_(a, sz1, b, sz2)                                              \
+    ((__u64)(a) <= (__u64)(b) && ((__u64)(a) + (__u64)(sz1)) >= ((__u64)(b) + (__u64)(sz2)))
+    
+// #define _crossed_(a, sz1, b, sz2)   ((a >= b && a < b + sz2) || (b >= a && b < a + sz1))
+
+
 #define MM_VMAP 2
 #define MM_NONE 0
 #define MM_HEAP 1

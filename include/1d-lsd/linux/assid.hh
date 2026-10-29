@@ -23,7 +23,7 @@ extern "C" {
 namespace SlitYaX86
 {
 /** Feed this to Lyss::push() **/
-bin_hdr_t *new_Lyss_entry(void *ptr, __u64 off, __u64 sz);
+bin_hdr_t *new_lyss(void *ptr, __u64 off, __u64 sz);
 };
 
 namespace SlitYaX86 {
@@ -35,21 +35,27 @@ struct XLyss : public Lyss {
 
     XLyss(x1Dlsd *xlsd, std::shared_ptr<ElfObj> elf);
 
-    __u64 get_size(enum _1DLSD_TYPE &t) override {
+    __u64 get_size(enum _1DLSD_TYPE t) override {
         return _get_size(t);
     }
 private:
-    __u64 _get_size(enum _1DLSD_TYPE &t);
-    void align_binary(__u64 off, __u64 sz) override;
+    __u64 _get_size(enum _1DLSD_TYPE t);
+    void align_bin(__u64 off, __u64 sz) override;
 };
 
 class x1Dlsd : public _1Dlsd {
-    XLyss     lyss;
 public:
+    XLyss     xlyss;
     x1Dlsd(acid_pass& _pass, std::shared_ptr<ElfObj> elfptr)
-        :   lyss(this, elfptr),
-            _1Dlsd(dynamic_cast<Lyss*>(&lyss), _pass)
-    {}
+        :   _1Dlsd(nullptr, _pass),
+            xlyss(this, elfptr)
+    {
+        dynamic_cast<_1Dlsd*>(this)->lyss = dynamic_cast<Lyss*>(&xlyss);
+    }
+
+    // void run() override {
+    //     pass._init_(this);
+    // }
 };
 };
 #endif
