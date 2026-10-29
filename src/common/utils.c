@@ -1,7 +1,13 @@
 #include "../../include/common/utils.h"
 #include "../../include/common/mem.h"
 #include <assert.h>
-#include <windows.h>
+#if defined(_WIN32)
+# include <windows.h>
+#endif
+#if defined(__linux__)
+# include <sys/mman.h>
+# include "../../include/common/linux/proc_self_maps.h"
+#endif
 
 const char *strerr(perr_t err) {
     switch (err) {
@@ -24,18 +30,6 @@ void *xmalloc(__u64 size) {
     assert(!!ptr);
     memset(ptr, 0, size);
     return ptr;
-}
-
-__u32 FileExists(char *file) {
-    __u32 dwAttr = GetFileAttributes(file);
-    return (dwAttr != INVALID_FILE_ATTRIBUTES &&
-            !(dwAttr & FILE_ATTRIBUTE_DIRECTORY));
-}
-
-__u32 DirExists(char *dir) {
-    __u32 dwAttr = GetFileAttributes(dir);
-    return (dwAttr != INVALID_FILE_ATTRIBUTES &&
-            !!(dwAttr & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 void hexdump(void *addr, __u64 sz) {
@@ -78,14 +72,47 @@ void hexdump(void *addr, __u64 sz) {
     }
 }
 
-int __wr_init(void *addr, __u64 size, __u32 *dw) {
+__u64 ptrArrSize(char **x) {
+    __u64 r=0;
+    while(!!*x) { x++; r++; };
+    return r;
+}
+
+#if defined(_WIN32)
+__u32 FileExists(char *file) {
+    __u32 dwAttr = GetFileAttributes(file);
+    return (dwAttr != INVALID_FILE_ATTRIBUTES &&
+            !(dwAttr & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+__u32 DirExists(char *dir) {
+    __u32 dwAttr = GetFileAttributes(dir);
+    return (dwAttr != INVALID_FILE_ATTRIBUTES &&
+            !!(dwAttr & FILE_ATTRIBUTE_DIRECTORY));
+}
+#endif
+/**/
+
+
+int __wr_init(void *addr, __u64 size, __u32 *perm) {
+#if defined(_WIN32)
     return VirtualProtect(PAGE_ALIGN_DOWN(addr), PAGE_ALIGN_UP(size),
-                          PAGE_READWRITE, dw);
+                              PAGE_READWRITE, perm);
+#endif
+#if defined(__linux__)
+    *perm = UnixMemQuery(PAGE_ALIGN_DOWN(addr));
+    return mprotect(addr, PAGE_ALIGN_UP(size), PROT_READ|PROT_WRITE);
+#endif
 }
 
 int __wr_exit(void *addr, __u64 size, __u32 perm) {
+#if defined(_WIN32)
     return VirtualProtect(PAGE_ALIGN_DOWN(addr), PAGE_ALIGN_UP(size), perm,
                           NULL);
+#endif
+#if defined(__linux__)
+    return mprotect(addr, PAGE_ALIGN_UP(size), perm);
+#endif
 }
 
 int _write_mem(void *dst, void *src, __u64 size) {
@@ -102,7 +129,9 @@ int _write_mem(void *dst, void *src, __u64 size) {
     return 0;
 }
 
-int _zero_memory(void *dst, __u64 size) { return _write_memset(dst, 0, size); }
+int _zero_memory(void *dst, __u64 size) {
+    return _write_memset(dst, 0, size);
+}
 
 int _write_memset(void *dst, int ch, __u64 size) {
     __u32 dw;
@@ -117,40 +146,6 @@ int _write_memset(void *dst, int ch, __u64 size) {
 
     return 0;
 }
-
-int _write_uint16(void *addr, __u16 v) {
-    __u32 dw;
-    if (!__wr_init(addr, PAGE_SIZE, &dw))
-        return -1;
-    *(__u16 *)addr = v;
-    if (!__wr_exit(addr, PAGE_SIZE, dw))
-        return -1;
-
-    return 0;
-}
-
-int _write_dwordptr(void *addr, __u32 v) {
-    __u32 dw;
-    if (!__wr_init(addr, PAGE_SIZE, &dw))
-        return -1;
-    *(__u32 *)addr = v;
-    if (!__wr_exit(addr, PAGE_SIZE, dw))
-        return -1;
-
-    return 0;
-}
-
-int _write_qwordptr(void *addr, __u64 v) {
-    __u32 dw;
-    if (!__wr_init(addr, PAGE_SIZE, &dw))
-        return -1;
-    *(void **)addr = v;
-    if (!__wr_exit(addr, PAGE_SIZE, dw))
-        return -1;
-
-    return 0;
-}
-
 __s8 _memcmp(void *a, void *b, __u64 size) {
     for (__u64 i = 0; i < size; i++)
         if (((char *)a)[i] != ((char *)b)[i])

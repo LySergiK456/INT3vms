@@ -2,23 +2,22 @@
 #include <assert.h>
 #include <windows.h>
 extern "C" {
-#include "../../include/syx86/syscall/win_syscall.h"
+    #include "../../include/syx86/syscall/windows/win_syscall.h"
 };
 
-__attribute__((constructor)) void SlitYaX86::init_wine_syscalls() {
-    HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
-    assert(HANDLE_OK(ntdll));
-
-    WINE_EACH_SYSCALL(e) {
-        assert(!!e && !!e->name); // "Nullptr in Wine-SyscallTable")
-        e->fn = (void *)GetProcAddress(ntdll, e->name);
-
-        if (!e->fn)
-            DBG_FMT("[!] Failed to GetProcAddress of \"%s\"\n", e->name);
+namespace SlitYaX86 {
+    shadow_mem_t *Ldr::VAtoShadow(__u64 virt) {
+        for (auto sh_mem : shadow) {
+            if (!!_contain_(sh_mem->uc_mem->addr, sh_mem->uc_mem->size, virt)) {
+                return sh_mem;
+            }
+        }
+        return nullptr;
     }
-}
+};
 
 __s8 SlitYaX86::wine_name(char *ret, __u64 size, char *dll_name) {
+#if defined (_WIN32)
     if (!ret)
         return -1;
 
@@ -35,4 +34,5 @@ __s8 SlitYaX86::wine_name(char *ret, __u64 size, char *dll_name) {
     assert(strlen(ret) + 1 <= size);
 
     return 0;
+#endif
 }

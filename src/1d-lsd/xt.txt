@@ -54,7 +54,7 @@
 // #include <assert.h>
 // #include "../../include/1d-lsd/rel_insn.hh"
 // extern "C" {
-// 	#include "../../include/1d-lsd/rel_yayo.h"
+// 	#include "../../include/1d-lsd/yayo.h"
 // };
 
 // namespace SlitYaX86 {

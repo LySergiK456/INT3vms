@@ -2,10 +2,9 @@
 #include <ntdef.h>
 #include <unicorn/unicorn.h>
 #include <windows.h>
-
-static inline uc_err _uc_init_x86_64_(uc_engine **uc) {
-    return uc_open(UC_ARCH_X86, UC_MODE_64, uc);
-}
+extern "C" {
+    #include "../../../../include/common/utils.h"
+};
 
 namespace SlitYaX86 {
 WinLdr::WinLdr(int argc, char **argv)

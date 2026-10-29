@@ -9,7 +9,7 @@
 extern "C" {
     #include "../../include/syx86/dex/dex.h"
     #include "../../include/common/utils.h"
-    #include "../../include/syx86/syscall/win_syscall.h"
+    #include "../../include/syx86/syscall/windows/win_syscall.h"
 };
 
 static void dbg_pr_insn(insn_t &, void *, char *, char *, __u64, char *, char *,

@@ -3,7 +3,7 @@
 #include <windows.h>
 extern "C" {
     #include "../../include/common/utils.h"
-    #include "../../include/syx86/syscall/win_syscall.h"
+    #include "../../include/syx86/syscall/windows/win_syscall.h"
 };
 
 __u64 _syscall_hook_NtQueryProcessInformation(uc_engine *uc, __NtArgs *args, void *user_ctx, __u64 rax) {
@@ -21,10 +21,8 @@ Razor<TDex, TLdr>::Razor(int argc, char **argv)
 {
     uc_hook_add(ldr.uc, &uc_insn_hook, UC_HOOK_CODE, (void *)&WinDex::hook_code,
                 dex, 1, 0);
-
     __u64 virt = ldr.FindDLL("ntdll.dll")->virt;
-    DexVerse::addDexSource(dex->ctx, ldr.proc.peb_addr, sizeof(_PEB_));
-
+    
     WinDex::syscall_hook(SyscallHook::PreHook, "NtQueryInformationProcess", (void*)_syscall_hook_NtQueryProcessInformation);
     _PEB_ *peb = reinterpret_cast<_PEB_ *>(__readgsqword(0x60));
     _PEB_LDR_DATA_ *peb_ldr = reinterpret_cast<_PEB_LDR_DATA_ *>(peb->Ldr);

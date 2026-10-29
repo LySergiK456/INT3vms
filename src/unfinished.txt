@@ -1,13 +1,14 @@
-SSI
-user space shadow mem inside the fucking each insn
-* ntskrnl.exe[if this is it. - it isnt!] args
-time for SYP to reconstruct into a binary, so it can be passed to ghidra
+[
+	SSI - the thing I wrote
+	* user space shadow mem inside the fucking each insn
+	* ntskrnl.exe[if this is it. - it isnt!] args
+]
+1d-lsd
 
-pe parser, this proejct - pybind11
-qt app dbg - run, load syms
-DEBUGSERVER - uc_start, syscall
-ELF parser
-
+- pybind - yes
+TUI suffices
+pwntools eh
+ELF parser - yep
 
 TLS
 syscall - cocksucking mem_write overwrites all the shit
