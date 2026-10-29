@@ -27,6 +27,7 @@ namespace SlitYaX86 {
     class x1Dlsd;   // Linux packer
     #if defined(__linux__)
         class ElfObj;
+        class XLyss;
     #endif
 };
 
@@ -57,20 +58,22 @@ public:
         return push(img, t, *v);
     }
     Generic(T) void push(Binary_t *img, enum _1DLSD_TYPE t, T &v) {
+        if (!v.mm.sz) return;
         map[v.off] = (struct _1Dlsd_entry){
-            .t = t, .mm = &v.mm, .src = {img, v.off, v.mm.sz}};
+            .t=t, .mm=&v.mm, .src={img, v.off, v.mm.sz}, .dst={v.off, v.mm.sz}
+        };
     }
-    Generic(Fn) int feach(enum _1DLSD_TYPE &t, Fn fn) {
+    Generic(Fn) int feach(enum _1DLSD_TYPE t, Fn fn) {
         return feach(t, nullptr, fn);
     }
-    Generic(Fn) int feach(enum _1DLSD_TYPE &t, struct _1Dlsd_entry *v, Fn fn) {
+    Generic(Fn) int feach(enum _1DLSD_TYPE t, struct _1Dlsd_entry *v, Fn fn) {
         int i = 0;
         try {
             for (auto &[_, e] : map)
                 if (e.t == t && ++i && !!e.mm) {
                     if (!!v) *v = e;
                     for (__u64 off = 0, sz = get_size(t); off < e.mm->sz; off += sz) {
-                        fn(static_cast<lambda_arg<decltype(fn)>>(e.mm->mem+off));
+                        fn(static_cast<lambda_arg<decltype(fn)>>(e.mm->mem+off), e);
                     }
                 }
         } catch (...) {}
@@ -84,8 +87,14 @@ public:
 
 protected:
     void SliceSegments();
+    void align_map(__u64 off, __u64 sz);
+    virtual void align_binary(__u64 off, __u64 sz) {
+        static_assert("You Should've implement this!");
+    }
+    struct _1Dlsd_entry *get_by_type(enum _1DLSD_TYPE t, __u64 off);
 
     friend class _1Dlsd;
+    friend class XLyss;
 };
 };
 
@@ -131,7 +140,7 @@ class _1Dlsd : public _1Dlsd_pack_t {
     bool insert(Binary_t *bin, enum _1DLSD_TYPE t, bin_hdr_t *e) {
 
     }
-    __s8 make(char *f);
+    void make(char *f);
 };
 };
 

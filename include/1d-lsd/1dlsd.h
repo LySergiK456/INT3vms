@@ -21,19 +21,18 @@ enum _1DLSD_bin_tYPE {
 };
 enum _1DLSD_TYPE {
     LSD_R   = 0x100,
-    LSD_RW  = 0x200,
-    LSD_RX  = 0x400,
-    LSD_RWX = 0x700,
+    LSD_W  = 0x200,
+    LSD_X  = 0x400,
     LSD_NONE= 0,
-    Ehdr,
-    Phdr,
-    Shdr,
-    Rela,
-    Rel,
-    Sym,
-    Dyn,
-    GNU_Verneed,
-    GNU_Versym,
+    ELF_Ehdr,
+    ELF_Phdr,
+    ELF_Shdr,
+    ELF_Rela,
+    ELF_Rel,
+    ELF_Sym,
+    ELF_Dyn,
+    ELF_GNU_Verneed,
+    ELF_GNU_Versym,
 };
 
 typedef int (*lsd_oper_calback)(instr_dat_t *insn, __u64 i, __u64 imm, instr_dat_t *out);
