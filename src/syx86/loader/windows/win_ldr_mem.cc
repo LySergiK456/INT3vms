@@ -243,17 +243,6 @@ uc_err Ldr::mcopy(__u64 virt, auto v) {
 }
 };
 
-namespace SlitYaX86 {
-shadow_mem_t *WinLdr::VAtoShadow(__u64 virt) {
-    for (auto sh_mem : shadow) {
-        if (!!_contain_(sh_mem->uc_mem->addr, sh_mem->uc_mem->size, virt)) {
-            return sh_mem;
-        }
-    }
-    return nullptr;
-}
-};
-
 template <typename P> static int _write_value(P *addr, auto v) {
     // using T = std::decay_t<decltype(v)>(v);
     __u32 dw;

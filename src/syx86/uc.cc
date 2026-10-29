@@ -1,9 +1,16 @@
 #include "../../include/syx86/uc.hh"
 #include "../../include/common/utils.hh"
 #include <assert.h>
+#if defined(__linux__)
+#include <sys/mman.h>
+#endif
 extern "C" {
-#include "../../include/common/utils.h"
+    #include "../../include/common/utils.h"
 };
+
+uc_err _uc_init_x86_64_(uc_engine **uc) {
+    return uc_open(UC_ARCH_X86, UC_MODE_64, uc);
+}
 
 __u64 Uc::reg(uc_engine *uc, X86Reg reg) {
     __u64 ret{};
@@ -83,16 +90,22 @@ uc_mem_region Uc::get_map_next(uc_engine *uc, __u64 addr) {
 }
 
 __u32 uc_perm(__u32 perm) {
+#if defined(_WIN32)
     switch (perm) {
-    case UC_PROT_R:
-        return PAGE_READONLY;
-    case UC_PROT_RWX:
-        return PAGE_EXECUTE_READWRITE;
-    case UC_PROT_RW:
-        return PAGE_READWRITE;
-    case UC_PROT_RX:
-        return PAGE_EXECUTE_READ;
+    case UC_PROT_R:     return PAGE_READONLY;
+    case UC_PROT_RWX:   return PAGE_EXECUTE_READWRITE;
+    case UC_PROT_RW:    return PAGE_READWRITE;
+    case UC_PROT_RX:    return PAGE_EXECUTE_READ;
     }
+#endif
+#if defined(__linux__)
+    switch (perm) {
+    case UC_PROT_R:     return PROT_READ;
+    case UC_PROT_RWX:   return PROT_READ|PROT_WRITE|PROT_EXEC;
+    case UC_PROT_RW:    return PROT_READ|PROT_EXEC;
+    case UC_PROT_RX:    return PROT_READ|PROT_WRITE;
+    }
+#endif
     assert(0);
     return -1;
 }

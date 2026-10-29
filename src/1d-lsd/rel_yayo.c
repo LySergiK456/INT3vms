@@ -1,109 +1,102 @@
-#include "../../include/1d-lsd/rel_yayo.h"
-#include "../../include/pe64/pe64.h"
-
-static struct rel_yayo_tic *ins_yayo_tic(struct rel_yayo *r, enum yayo_ref_t type);
-static __s64 _rel_align(struct rel_yayo *rel, __u64 off);
-static __s64 _yayo_px_align(struct rel_yayo_tic *tick, __u64 off);
-static void make_rel_yayo(mm_t *mm_out, struct rel_yayo *rel, struct rel_yayo_tic *tick);
-static void make_yayo_pe64(mm_t *mm_out, struct rel_yayo *rel, struct rel_yayo_tic *y);
-
-__s8 new_rel_yayo(struct rel_yayo *r) {
-    if (!r) return -1;
-    memset(r, 0, sizeof(struct rel_yayo));
-
-    llist_init(&r->ll_yayo, sizeof(struct rel_yayo_tic));
-    return 0;
-}
-
-__s8 YayoRelocate(mm_t *mm, struct rel_yayo *rel) {
-    // make_rel_yayo(mm, rel, NULL);
-}
-
-struct rel_yayo_tic *new_yayo_pe64(struct rel_yayo *r, pe64_image *pe, __u64 off, __u64 size) {
-    struct rel_yayo_tic *y = ins_yayo_tic(r, YAYO_PE64);
-    if (!y) return NULL;
-
-    y->pe.offset = off;
-    y->pe.size = size;
-    return y;
-}
-
-// struct rel_yayo_tic *new_yayo_sc(struct rel_yayo *r) {
-// 	return NULL;
-// }
-// struct rel_yayo_tic *new_yayo_vmmap(struct rel_yayo *r) {
-// 	return NULL;
-// }
-// struct rel_yayo_tic *new_yayo_uc(struct rel_yayo *r) {
-// 	return NULL;
-// }
-
-static struct rel_yayo_tic *ins_yayo_tic(struct rel_yayo *r, enum yayo_ref_t type) {
-    if (!r) return NULL;
-    struct rel_yayo_tic y = {.t = type};
-
-    llist_push(&r->ll_yayo, &y);
-    return r->ll_yayo.prev->v;
-}
-
-static void make_rel_yayo(mm_t *mm_out, struct rel_yayo *rel, struct rel_yayo_tic *tick) {
-    ll_each_value(&tick->ll_yayo_px,px) {
-        if (!llist_empty(&px->ll_yayo_px))
-            make_rel_yayo(mm_out, rel, px);
-
-        switch (px->t) {
-            case YAYO_PE64:
-                make_yayo_pe64(mm_out, rel, px);
-                break;
-            // case YAYO_SHELLCODE:    break;
-            // case YAYO_UC_VMMAP:     break;
-            // case YAYO_VMMAP:        break;
-            default:
-                return -1;
-        }
-    }
-    return 0;
-}
-
-
-static __s64 _rel_align(struct rel_yayo *rel, __u64 off) {
-    __s64 r=0;
-    ll_each_value(&rel->ll_yayo, px) r += _yayo_px_align(px, off);
-    return r;
-}
-
-static __s64 _yayo_px_align(struct rel_yayo_tic *tick, __u64 off) {
-    __s64 r=0;
-    ll_each_value(&tick->ll_yayo_px, y) {
-        if (!llist_empty(&y->ll_yayo_px)) r += _rel_align(y, off);
-        // if (y->out.off > off) return r;
-
-        switch (y->t) {
-            case YAYO_REL:      break;
-            case YAYO_REPLACE:  r += y->orig_size-y->dst_size; break;
-            case YAYO_ADD:      r += y->orig_size;   break;
-            case YAYO_REMOVE:   r -= y->orig_size;   break;
-        }
-    }
-    return r;
-}
+#include "../../include/1d-lsd/1dlsd.h"
+#include "../../include/1d-lsd/yayo.h"
+    
+#define is_ok(x) ((x) != -1)
 
 #define x8664_each(in, i, src, size)    \
         foreach_instr_off(X86_64, in, i, (src), (size))
 
-static void make_yayo_pe64(mm_t *mm_out, struct rel_yayo *rel, struct rel_yayo_tic *y) {
-    __u8 *out       = mm_out->mem;
-    // __u8 *src       = &y->pe.bin->pMem[y->pe.offset];
-    __s64 align     = _rel_align(rel, y->out.off);
-    // __u64 i=0;
-    // x8664_each(in, i, src, y->pe.size) {
-    //     __u64 off       = y->out.off + i;
-    //     pe64_image *bin = y->pe.bin;
-        
-    //     // llist_each_value(&y->ll_yayo_px, ypx) {
-    //     //     if (ypx->out.off == off) {
-    //     //         make_yayo_pe64(mm_out, rel, ypx);
-    //     //     }
-    //     // }
-    // }
+#define _x86_64_insn(in, sc)     init_instr(X86_64, (in), (sc))
+
+static void *yayo_src_mem(struct rel_yayo *ctx) {
+    switch (ctx->t) {
+        case YAYO_BIN:
+            return ctx->bin.bin->src.map + ctx->bin.offset;
+        default: goto fail;
+    }
+    
+    fail:
+    return NULL;
+}
+
+#define YAYO_EACH_PX(px, __e__) \
+        ll_each_value(px, __e__)
+
+static inline YAYO_INTERNAL __u64 rip_imm(instr_dat_t *insn, struct yayo_px *px, __u64 offset);
+
+static YAYO_INTERNAL
+__s8 rel_do_px(struct rel_yayo *ctx, struct yayo_px *_px_, mm_t *mm) {
+    __u64 i = 0;
+    void *src_mem   = yayo_src_mem(ctx);
+    __u64 align     = lsd_align(ctx->lsd, ctx->out.off);
+    instr_dat_t tmp;
+
+    x8664_each(insn, i, src_mem, ctx->bin.size) {
+        __u64 offset        = _px_->dst_off + i;
+        __u64 base_offset   = offset;
+
+        YAYO_EACH_PX(&_px_->ll_yayo_px, sub_px) {
+            if (sub_px->dst_off == offset)
+                if (!is_ok(rel_do_px(ctx, sub_px, mm)))
+                    return -1;
+        }
+
+        do  /** *** **** * ** ******** **************** **/
+        {   /** The Core - of Rel(insn relocation)-Yayo **/
+            /** *** **** * ** ******** **************** **/
+            offset += y_full_align(ctx, 0, offset);
+            void *ptr   = mm->mem + offset;
+            __u64 out_base  = offset += ctx->out.align;    // Here is the Funky shit
+
+            __u64 orig_imm = rip_imm(&insn, _px_, i);
+            __u64 dest_imm = orig_imm + y_full_align(ctx, base_offset, insn.in_sz) - align;
+            if (!get_rip_imm_oper(&insn))
+            {   /** No (RIP/ PTR [reg]) operand **/
+                memcpy(ptr, src_mem+i, insn.in_sz);
+                continue;
+            }
+
+            struct yayo_px *dst_px = y_orig_px(ctx, dest_imm + align);
+            if (!dst_px) {
+                dest_imm += lsd_align(ctx->lsd, orig_imm);
+                _StickInsn(&insn,  ptr, (dest_imm - ctx->bin.offset), out_base);
+                break;
+            }
+
+            struct xtc_px *_xtc = y_xtc_px(&ctx->ll_xtc_px, base_offset);
+            if (!!_xtc) {
+                *(&tmp) = (typeof(tmp)){0};
+                _x86_64_insn(&tmp, _xtc->sc);
+                _StickInsn(&tmp, ptr, dest_imm, base_offset);
+                break;
+            }
+
+            _StickInsn(&insn, ptr, dest_imm, base_offset);
+        } while(0);
+    }
+}
+
+static inline YAYO_INTERNAL __u64 rip_imm(instr_dat_t *insn, struct yayo_px *px, __u64 offset) {
+    __u64 imm = 0;
+    get_rip_ptr_addr(insn, px->orig_off + offset, &imm);
+    return 0;
+}
+
+YAYO_API y_full_align(struct rel_yayo *ctx, __u64 from, __u64 to) {
+    return 0;
+}
+
+YAYO_API __s8 YAYO_MAKE(struct rel_yayo *ctx) {
+    /* make mm_t */
+    mm_t *mm_out = xmalloc(sizeof(mm_t));
+    mm_out->t   = MM_HEAP;
+    mm_out->mem = xmalloc(0x21000);
+    mm_out->sz  = 0x21000;
+
+    YAYO_EACH_PX(&ctx->ll_yayo_px, px) {
+        if (!is_ok(rel_do_px(ctx, px, mm_out)))
+            return -1;
+    }
+
+    return 0;
 }

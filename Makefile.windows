@@ -1,0 +1,116 @@
+BDIR = ./build/windows
+GCC = ccache x86_64-w64-mingw32-gcc
+GXX = ccache x86_64-w64-mingw32-g++
+
+X86_CFLAGS=	-I./x86disass/include
+X86_LDFLAGS=-L./x86disass/build/windows
+
+UC_CFLAGS =	-I/home/rax/Documents/unicorn/include
+UC_LDFLAGS =-L/home/rax/Documents/unicorn/build
+
+objs = shellcode.o dexverse.o win_syscall.o wine_tabl.o win10_tabl.o main.o dex.o razor.o win_ldr.o win_ldr_mem.o win_ldr_image.o win_ldr_env.o syx86.o uc.o pe64.o util.o utils.o llist.o lsd_pe32.o rel_yayo.o rel_1dlsd.o xtc.o extc.o #dbgserver.o
+_1dlsd_objs = test_win_1dlsd.o shellcode.o uc.o pe64.o util.o utils.o llist.o lsd_pe32.o rel_yayo.o rel_1dlsd.o xtc.o extc.o
+
+
+CXXFLAGS = -w -g -MMD -MP
+CFLAGS = -w -g -MMD -MP
+
+-include $(objs:%=$(BDIR)/%.d)
+
+MAKE = make
+ECHO = echo
+MKDIR= mkdir
+
+TARGET = ./specimen/b.exe
+
+shellcode.o extc.o dbgserver.o main.o wine_tabl.o win10_tabl.o razor.o win_ldr.o win_ldr_mem.o win_ldr_image.o utils.o win_syscall.o win_ldr_env.o util.o uc.o syx86.o: CFLAGS += $(UC_CFLAGS) -lunicorn
+dexverse.o test_rel.o rel_yayo.o rel_1dlsd.o dex.o: CFLAGS += $(X86_CFLAGS) -lx86disass $(UC_CFLAGS) -lunicorn
+# dbgserver.o: CFLAGS += -lws2_32
+test_win_1dlsd.o xtc.o lsd_pe32.o pe64.o rel_yayo.o rel_1dlsd.o: CXXFLAGS += $(UC_CFLAGS)
+
+all: make_win
+
+.PHONY: make_win
+make_win: make_builddir $(objs)
+	@echo "[+] Compiling with -lunicorn -lx86disass"
+	$(GXX) $(addprefix $(BDIR)/,$(objs)) -lws2_32 $(X86_LDFLAGS) -lx86disass $(UC_LDFLAGS) -lunicorn $(CXXFLAGS) -o a.exe
+	@echo "-----------------------------"
+	@echo ""
+
+.PHONY: run
+run:
+	@echo "[+] Running " $(TARGET)
+	WINEPATH=. wine ./a.exe $(TARGET)
+###
+# Tests
+#
+.PHONY: test_1dlsd
+test_1dlsd: make_builddir $(_1dlsd_objs)
+	$(GXX) $(addprefix $(BDIR)/,$(_1dlsd_objs)) -lws2_32 $(X86_LDFLAGS) -lx86disass $(UC_LDFLAGS) -lunicorn $(CXXFLAGS) -o 1dlsd.exe
+	WINEPATH=. wine ./1dlsd.exe $(TARGET)
+
+clean:
+	rm -rf $(BDIR)/*
+
+make_builddir:
+	@if [ ! -d "$(BDIR)" ]; then				\
+		$(ECHO) "-----------------------------";\
+		$(ECHO) "Making build dir " "$(BDIR)";	\
+		$(MKDIR) -p $(BDIR);						\
+		$(MKDIR) -p $(BDIR)/dat;						\
+		$(MKDIR) -p $(BDIR)/symbols						\
+		$(MKDIR) -p $(BDIR)/xtc_table						\
+		$(ECHO) "-----------------------------";\
+	fi
+
+###
+# To build Object files
+#
+%.o: src/1d-lsd/%.c
+	$(GCC) -c $< -o $(BDIR)/$@ $(CFLAGS)
+
+%.o: src/1d-lsd/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(GXXFLAGS)
+
+%.o: src/1d-lsd/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/common/%.c
+	$(GCC) -c $< -o $(BDIR)/$@ $(CFLAGS)
+
+%.o: src/common/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/pe64/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/syscalls/windows/%.c
+	$(GCC) -c $< -o $(BDIR)/$@ $(CFLAGS)
+
+%.o: src/syscalls/windows/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/syx86/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/syx86/loader/windows/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/syx86/loader/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/syx86/dex/windows/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/xtc/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: src/xtc/%.c
+	$(GCC) -c $< -o $(BDIR)/$@ $(CFLAGS)
+
+%.o: ./%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+
+%.o: ./tests/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(CXXFLAGS)
+

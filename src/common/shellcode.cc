@@ -1,3 +1,4 @@
+#include <string.h>
 #include "../../include/common/shellcode.hh"
 extern "C" {
 	#include "../../include/common/utils.h"

@@ -1,6 +1,7 @@
 #include "../../include/common/utils.hh"
-#include <windows.h>
 
+#if defined(_WIN32)
+#include <windows.h>
 void Util::Red() {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     if (!HANDLE_OK(h))
@@ -46,6 +47,7 @@ void Util::Reset() {
     SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN |
                                    FOREGROUND_BLUE);
 }
+#endif
 
 __u64 Util::hash(char *name) {
     return std::hash<std::string>{}(name);

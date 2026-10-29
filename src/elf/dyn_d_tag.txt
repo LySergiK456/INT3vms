@@ -1,0 +1,42 @@
+case DT_NEEDED:	break;
+		            // case DT_PLTRELSZ:   break;//pltrel sz
+		            // case DT_PLTREL:     break;//pltrel
+		            // case DT_PLTGOT:     break;//plt and or got
+		            // case DT_JMPREL:     break;  // plt
+
+		            // case DT_STRTAB:     break;//strtab
+		            // case DT_STRSZ:      break;//strtab size
+		            // case DT_SYMTAB:     break;//symtab
+		            // case DT_SYMENT:     break;// symbol entry size
+		            
+		            case DT_INIT:
+		                bin->init_fn = self->base_virt + dyn->d_un.d_val;
+		                break;
+		            case DT_FINI:
+		                bin->init_fn = self->base_virt + dyn->d_un.d_val;
+		                break;
+		            // case DT_SONAME:     break;//strtab off to name of shared object
+		            // case DT_SYMBOLIC:   break;// look at me before look into main exe for symbols
+		            
+		            // case DT_REL:        break;
+		            // case DT_RELSZ:      break;
+		            // case DT_RELENT:     break;
+
+		            // case DT_RELA:       break;
+		            // case DT_RELASZ:     break;
+		            // case DT_RELAENT:    break;
+
+		            // case DT_TEXTREL:    break;
+		            // case DT_HASH:       break;
+
+		            case DT_BIND_NOW:
+		                bin->lazy_binding=-1;
+		                break;
+
+		            case DT_RPATH:
+		            case DT_RUNPATH:
+		                self->runpath = &self->e_usr.str[dyn->d_un.d_val];
+		                break;
+		            // case DT_VERNEED:
+		            // case DT_VERNEEDNUM:
+		            // case DT_VERSYM: 
