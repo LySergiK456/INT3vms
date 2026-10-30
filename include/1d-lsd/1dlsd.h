@@ -24,7 +24,7 @@ enum _1DLSD_TYPE {
     LSD_W  = 0x200,
     LSD_X  = 0x400,
     LSD_NONE= 0,
-    ELF_Ehdr,
+    ELF_Ehdr=1,
     ELF_Phdr,
     ELF_Shdr,
     ELF_Rela,

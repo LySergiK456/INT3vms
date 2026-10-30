@@ -61,12 +61,10 @@ public:
     }
     LSD_API void push(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t& v) {
         if (!v.mm.sz) return;
-        for (auto& [off, entry] : map)
-        {
-            if (entry.t != t) continue;
-
-            if (!!_contains_(entry.dst.off, entry.dst.sz, v.off, v.mm.sz))
+        for (auto& [off, entry] : map) {
+            if (!!_crossed_(entry.dst.off, entry.dst.sz, v.off, v.mm.sz)) {
                 return;
+            }
         }
         map[v.off] = (struct _1Dlsd_entry){
             .t=t, .mm=&v.mm, .src={img, v.off, v.mm.sz}, .dst={v.off, v.mm.sz}
@@ -80,6 +78,7 @@ public:
         try {
             for (auto& entry : map) {
                 auto& e = std::get<struct _1Dlsd_entry>(entry);
+
                 if (e.t == t && ++i && !!e.mm) {
                     if (!!v) *v = e;
                     for (__u64 off = 0, sz = get_size(t); !!sz && off < e.mm->sz; off += sz) {
@@ -140,11 +139,15 @@ namespace SlitYaX86 {
         Util::MMap_t<lsd_oper_calback> op_callbacks;
       protected:
         _1Dlsd *lsd{nullptr};
+        x1Dlsd *xlsd{nullptr};
 
       public:
         acid_pass() = default;
         virtual LSD_STATUS _init_(_1Dlsd *lsd) { return LSD_OK; }
+        virtual LSD_STATUS _init_(x1Dlsd *lsd) { return LSD_OK; }
+        
         friend class _1Dlsd;
+        friend class x1Dlsd;
     };
 };
 

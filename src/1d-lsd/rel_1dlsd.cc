@@ -53,7 +53,7 @@ void _1Dlsd::make(char *f) {
 
     DBG_FMT("-[_1Dlsd]-\t~[+]~ Dumping to [%s]\n", f);
     for (auto& [off, e] : lyss->map) {
-         if (!llist_empty(&e.px))
+        if (!llist_empty(&e.px))
         {
             ll_each_value(&e.px, patch)
             {
@@ -70,7 +70,7 @@ void _1Dlsd::make(char *f) {
 namespace SlitYaX86 {
 struct _1Dlsd_entry *Lyss::get_by_type(enum _1DLSD_TYPE t, __u64 off) {
     struct _1Dlsd_entry *retn=nullptr;
-    feach(t, [&](Elf64_Phdr *ph, struct _1Dlsd_entry *e) {
+    feach(t, [&](void *_, struct _1Dlsd_entry *e) {
         if (e->src.off >= off) { retn=e; return; };
     });
     return retn;
