@@ -120,7 +120,7 @@ public:
         };
 
         llist_push((_LL_TYPE_*)&tab->px, &px);
-        // align_map(tab->dst.off + px.dst.off, px.dst.sz);
+        align_map(tab->dst.off + px.dst.off, px.dst.sz);
         align_bin(tab->dst.off + px.dst.off, px.dst.sz);
     }
 

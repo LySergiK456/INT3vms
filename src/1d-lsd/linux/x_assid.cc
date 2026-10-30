@@ -25,14 +25,16 @@ namespace SlitYaX86
                 sizeof(Elf64_Ehdr)));
         
         __u64 dyn_count{};
-        elfx64_each_dynamic(elf.get(), dyn) dyn_count++;
-        lyss.push_ptr(
-            bin,
-            ELF_Dyn,
-            new_lyss(
-                pMem,
-                (__u64)elf->e_usr.dynamic - (__u64)pMem,
-                sizeof(Elf64_Dyn) * dyn_count));
+        __u64 dyn_off = ((__u64)elf->e_usr.dynamic - (__u64)pMem);
+        elfx64_each_dynamic(elf.get(), dyn) {
+            lyss.push_ptr(
+                bin,
+                ELF_Dyn,
+                new_lyss(
+                    pMem,
+                    dyn_off + (dyn_count++*sizeof(Elf64_Dyn)),
+                    sizeof(Elf64_Dyn)));            
+        }
 
         __u64 ph_ndx{};
         elfx64_each_ph(elf, ph)
@@ -55,7 +57,7 @@ namespace SlitYaX86
             lyss.push_ptr(
                 bin,
                 static_cast<enum _1DLSD_TYPE>(perms),
-                new_lyss(pMem, ph->p_offset, ph->p_filesz));
+                new_lyss(pMem, ph->p_offset, ALIGN_UP(ph->p_filesz, ph->p_align)));
         }
 
         __u64 sh_ndx{};
@@ -91,13 +93,13 @@ __u64 XLyss::MemConv(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
         switch (src_type) {
         case MT::Virt:
             if (_contain_(_p->p_vaddr, ALIGN_UP(_p->p_memsz, _p->p_align), value)) {
-                ret=_p->p_vaddr + value - _p->p_vaddr;
+                ret=_p->p_vaddr + (value - _p->p_vaddr);
                 return;
             }
             break;
         case MT::Off:
             if (_contain_(_p->p_offset, _p->p_filesz+1, value)) {
-                ret=_p->p_offset + value - _p->p_offset;
+                ret=_p->p_offset + (value - _p->p_offset);
                 return;
             }
             break;
@@ -154,6 +156,15 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
     if (ehdr->e_shoff > off) ehdr->e_shoff += sz;
     if (ehdr->e_phoff > off) ehdr->e_phoff += sz;
 
+    // elf.ehdr->e_entry = h.orig_vtov(&elf, elf.ehdr->e_entry);
+    lyss.feach(ELF_Dyn, [&](Elf64_Dyn *dyn, void *_) {
+        if (dyn_is_ptr(dyn)) {
+            // DBG_FMT("%lx %lx!!!\n", dyn->d_un.d_ptr, lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr));
+            dyn->d_un.d_ptr =
+                lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr);
+        }
+    });
+
     lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, void *_) {
         if (_contain_(_p->p_offset, _p->p_filesz, off)) {
             _p->p_memsz     += sz;
@@ -170,15 +181,6 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
         } else if (sec->sh_offset >= off) {
             sec->sh_addr    += sz;
             sec->sh_offset  += sz;
-        }
-    });
-
-    // elf.ehdr->e_entry = h.orig_vtov(&elf, elf.ehdr->e_entry);
-    lyss.feach(ELF_Dyn, [&](Elf64_Dyn *dyn, void *_) {
-        if (dyn_is_ptr(dyn)) {
-            dyn->d_un.d_ptr =
-                lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr);
-            DBG_FMT("%lx!!!\n", lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr));
         }
     });
 }

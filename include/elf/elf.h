@@ -125,9 +125,9 @@ typedef struct _elfobj_t {
 			(void*)s < (void*)(&(elf)->shdr32[(elf)->ehdr32->e_shnum]);	\
 			s++)
 
-#define elfx64_each_dynamic(elf, dyn)			\
+#define elfx64_each_dynamic(elf, dyn)					\
         for (Elf64_Dyn *dyn = (elf)->e_usr.dynamic64;	\
-            !!dyn->d_tag && !!dyn->d_un.d_val;	\
+            dyn->d_tag != DT_NULL;						\
             dyn++)
 
 #define elfx86_each_dynamic(elf, dyn)			\

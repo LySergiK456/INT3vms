@@ -177,7 +177,7 @@ namespace SlitYaX86
 __u64 ElfObj::vtof(__u64 virt) {
 	elfx64_each_ph(this, ph)
 	{
-		if (_contain_(ph->p_vaddr, ALIGN_UP(ph->p_memsz, ph->p_align), virt))
+		if (_contain_(ph->p_vaddr, ph->p_filesz, virt))
 			return ph->p_offset + (virt - ph->p_vaddr);
 	}
 	return -1;

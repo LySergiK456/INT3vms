@@ -49,8 +49,8 @@ using MT = MemConvType;
 __u64 Lyss::MemBase(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
     __u64 offset{};
     switch (src_type) {
-        case MT::Virt:  offset = bin->vtof(value);
-        case MT::Off:   offset = value;
+        case MT::Virt:  offset = bin->vtof(value);  break;
+        case MT::Off:   offset = value;             break;
         default: assert(0);
     }
     
@@ -60,12 +60,16 @@ __u64 Lyss::MemBase(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
         {
             __u64 ret = lsd_off + (offset - emm.src.off);
             switch (dst_type) {
-                case MT::Virt:  return mconv_ftov(bin, ret);
-                case MT::Off:   return ret;
+                case MT::Virt:  return mconv_ftov(bin, ret);break;
+                case MT::Off:   return ret;                 break;
                 default: assert(0);
             }
         }
     }
+    for (auto& [lsd_off, emm] : map) {
+        printf("[] %p %p %p\n", emm.src.off, emm.src.sz, offset);
+    }
+    xx(offset);
     return -1;
 }
 };
