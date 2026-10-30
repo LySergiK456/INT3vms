@@ -16,8 +16,13 @@ namespace SlitYaX86 {
 
 		ElfObj() = delete;
 		ElfObj(char *file, char *symtab_dir);
+
 		constexpr bool IsX64();
 		constexpr bool IsX86();
+
+	    __u64 vtof(__u64 v) override;
+	    __u64 ftov(__u64 v) override;
+
 		__u64 virtBase();
 		bool is_overflow(__u64 off);
 	private:
@@ -25,5 +30,7 @@ namespace SlitYaX86 {
 		__s8 parse_all();
 		void parse_dynamic();
 	};
+	
+	bool dyn_is_ptr(Elf64_Dyn *dyn);
 };
 #endif

@@ -13,6 +13,9 @@ struct Binary_t : public bin_t {
     Binary_t() : bin_t{} {};
     Binary_t(int type, void *map, __u64 sz);
     virtual ~Binary_t() = default;
+
+    virtual __u64 vtof(__u64 v) { assert(0); };
+    virtual __u64 ftov(__u64 v) { assert(0); };
 };
 };
 

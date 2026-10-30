@@ -14,7 +14,7 @@ namespace SlitYaX86
 	struct YayoPx : public yayo_px {
 		YayoPx *_rel_(enum yayo_px_t t, void *dat, __u64 off, __u64 size) {
 			struct yayo_px px = {
-				.t=t, .data=dat, orig_off=orig_off, .orig_size=orig_size
+				.t=t, .data=dat, .orig_off=off, .orig_size=size
 			};
 			return reinterpret_cast<YayoPx*>(llist_push((_LL_TYPE_*)&ll_yayo_px, &px));
 		}
@@ -40,7 +40,7 @@ namespace SlitYaX86
 
 		YayoPx *_rel_(enum yayo_px_t t, void *dat, __u64 orig_off, __u64 orig_size) {
 			struct yayo_px px = {
-				.t=t, .data=dat, orig_off=orig_off, .orig_size=orig_size
+				.t=t, .data=dat, .orig_off=orig_off, .orig_size=orig_size
 			};
 			return reinterpret_cast<YayoPx*>(llist_push((_LL_TYPE_*)&rel.ll_yayo_px, &px));
 		}

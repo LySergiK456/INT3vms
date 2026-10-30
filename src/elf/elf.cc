@@ -25,6 +25,7 @@ namespace SlitYaX86 {
 
 		if (!__IsOk(load_elf(), ok)) return;
 		if (!__IsOk(parse_all(), ok)) return;
+		ElfObj::parse_dynamic();
 
 
 		bin->entry_va = virtBase();
@@ -80,8 +81,11 @@ __s8 ElfObj::parse_all() {
 	} while(0));
 
 	elfx64_each_ph(self, ph)
-		if (ph->p_type == PT_LOAD)
-		{
+	switch (ph->p_type) {
+		// case PT_DYNAMIC:
+			// e_usr.dynamic64 = (Elf64_Dyn*)&mem[ph->p_offset];
+			// break;
+		case PT_LOAD:
 			if (!!is_overflow(ph->p_offset + ph->p_filesz)) {
 				DBG_FMT("[!] overflowing phdr 0x%lx/0x%lx\n",
 					ph->p_offset + ph->p_filesz,
@@ -98,7 +102,8 @@ __s8 ElfObj::parse_all() {
 				.fillwith = '\xcc',
 			};
 			llist_push((_LL_TYPE_*)&ll_regions, &reg);
-		}
+			break;
+	}
 	return 0;
 }
 };
@@ -109,7 +114,7 @@ namespace SlitYaX86 {
 		do {
 			elfx64_each_ph(self, ph) {
 				if (ph->p_type == PT_DYNAMIC)
-					e_usr.dynamic->dyn = reinterpret_cast<void*>(&mem[ph->p_offset]);
+					e_usr.dynamic = reinterpret_cast<void*>(&mem[ph->p_offset]);
 			}
 
 			elfx64_each_dynamic(self, dyn)
@@ -117,13 +122,13 @@ namespace SlitYaX86 {
 				switch (dyn->d_tag) {
 					case DT_NEEDED:	break;
 		            case DT_INIT:
-		                bin->init_fn = (typeof(bin->init_fn))(
+		                bin->init_fn = (decltype(bin->init_fn))(
 		                		self->base_virt
 		                		+ (__u64)dyn->d_un.d_val);
 		                break;
 		           
 		            case DT_FINI:
-		                bin->fini_fn = (typeof(bin->fini_fn))(
+		                bin->fini_fn = (decltype(bin->fini_fn))(
 		                		self->base_virt
 		                		+ (__u64)dyn->d_un.d_val);
 		                break;
@@ -142,7 +147,53 @@ namespace SlitYaX86 {
 	}
 };
 
+bool SlitYaX86::dyn_is_ptr(Elf64_Dyn *dyn) {
+	switch (dyn->d_tag) {
+		case DT_RUNPATH:
+		case DT_SONAME:
+		case DT_HASH:
+		case DT_STRTAB:
+		case DT_SYMTAB:
+		case DT_RELA:
+		case DT_INIT:
+		case DT_FINI:
+		case DT_RPATH:
+		case DT_PLTGOT:
+		case DT_INIT_ARRAY:
+		case DT_FINI_ARRAY:
+		case DT_REL:
+		case DT_JMPREL:
+		case DT_VERSYM:
+		case DT_VERNEED:
+			return true;
+	}
+
+	return false;
+}
+
+
+namespace SlitYaX86
+{	
+__u64 ElfObj::vtof(__u64 virt) {
+	elfx64_each_ph(this, ph)
+	{
+		if (_contain_(ph->p_vaddr, ALIGN_UP(ph->p_memsz, ph->p_align), virt))
+			return ph->p_offset + (virt - ph->p_vaddr);
+	}
+	return -1;
+}
+__u64 ElfObj::ftov(__u64 off) {
+	elfx64_each_ph(this, ph)
+	{
+		if (_contain_(ph->p_offset, ph->p_filesz, off))
+			return ph->p_vaddr + (off - ph->p_offset);
+	}
+	return -1;
+}
+};
+
 namespace SlitYaX86 {
+
 	bool ElfObj::is_overflow(__u64 off) {
 		return (off >= self->f.size);
 	}

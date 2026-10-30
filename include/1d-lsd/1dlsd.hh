@@ -34,6 +34,14 @@ namespace SlitYaX86 {
 };
 
 namespace SlitYaX86 {
+    enum class MemConvType : __u8
+    {
+        Virt=1,
+        Off =2,
+    };
+};
+
+namespace SlitYaX86 {
 struct Lyss {
     struct {
         x1Dlsd  *nix_lsd;
@@ -112,9 +120,23 @@ public:
         };
 
         llist_push((_LL_TYPE_*)&tab->px, &px);
-        align_map(tab->dst.off+px.dst.off, px.dst.sz);
-        align_bin(tab->dst.off+px.dst.off, px.dst.sz);
+        // align_map(tab->dst.off + px.dst.off, px.dst.sz);
+        align_bin(tab->dst.off + px.dst.off, px.dst.sz);
     }
+
+    virtual
+    __u64 MemConv(Binary_t*, MemConvType, __u64, MemConvType) = 0;
+    __u64 MemBase(Binary_t*, MemConvType, __u64, MemConvType);
+
+    LSD_API __u64 orig_vtov(Binary_t*, __u64);
+    LSD_API __u64 orig_ftof(Binary_t*, __u64);
+    LSD_API __u64 orig_vtof(Binary_t*, __u64);
+    LSD_API __u64 orig_ftov(Binary_t*, __u64);
+
+    LSD_API __u64 mconv_vtov(Binary_t*, __u64);
+    LSD_API __u64 mconv_ftof(Binary_t*, __u64);
+    LSD_API __u64 mconv_vtof(Binary_t*, __u64);
+    LSD_API __u64 mconv_ftov(Binary_t*, __u64);
 
     bin_hdr_t *&operator<<(bin_hdr_t&& v);
     std::map<__u64, struct _1Dlsd_entry> &operator()();

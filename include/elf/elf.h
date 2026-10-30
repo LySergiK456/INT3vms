@@ -61,7 +61,7 @@ typedef struct _elfobj_t {
 		char			*interp;
 		ElfU_Shdr		*plt, *got, *got_plt;
 		ElfU_Sym 		*dynsym, *symtab;
-		ElfU_Dyn		*dynamic;
+		ElfUn(Dyn, dynamic);
 		
 		ElfUn(Shdr,	str_shdr);
 		char	*strtab;
@@ -126,7 +126,7 @@ typedef struct _elfobj_t {
 			s++)
 
 #define elfx64_each_dynamic(elf, dyn)			\
-        for (Elf64_Dyn *dyn = (elf)->e_usr.dynamic->dyn64;	\
+        for (Elf64_Dyn *dyn = (elf)->e_usr.dynamic64;	\
             !!dyn->d_tag && !!dyn->d_un.d_val;	\
             dyn++)
 

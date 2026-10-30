@@ -23,6 +23,16 @@ namespace SlitYaX86
                 elf->mem,
                 0,
                 sizeof(Elf64_Ehdr)));
+        
+        __u64 dyn_count{};
+        elfx64_each_dynamic(elf.get(), dyn) dyn_count++;
+        lyss.push_ptr(
+            bin,
+            ELF_Dyn,
+            new_lyss(
+                pMem,
+                (__u64)elf->e_usr.dynamic - (__u64)pMem,
+                sizeof(Elf64_Dyn) * dyn_count));
 
         __u64 ph_ndx{};
         elfx64_each_ph(elf, ph)
@@ -67,11 +77,40 @@ namespace SlitYaX86
                     sec->sh_offset,
                     ALIGN_UP(sec->sh_size, sec->sh_addralign)));
         }
+
     }
 };
 
 namespace SlitYaX86 {
-__u64 XLyss::_get_size(enum _1DLSD_TYPE t) {
+using MT = MemConvType;
+
+__u64 XLyss::MemConv(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
+    __u64 ret{-1};
+
+    lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, void *_) {
+        switch (src_type) {
+        case MT::Virt:
+            if (_contain_(_p->p_vaddr, ALIGN_UP(_p->p_memsz, _p->p_align), value)) {
+                ret=_p->p_vaddr + value - _p->p_vaddr;
+                return;
+            }
+            break;
+        case MT::Off:
+            if (_contain_(_p->p_offset, _p->p_filesz+1, value)) {
+                ret=_p->p_offset + value - _p->p_offset;
+                return;
+            }
+            break;
+        default: assert(0);
+    }
+    });
+
+    return ret;
+}
+};
+
+namespace SlitYaX86 {
+__u64 XLyss::get_size(enum _1DLSD_TYPE t) {
     auto s = base_elf.get();
     __u64 v = 0;
     switch (t) {
@@ -115,7 +154,7 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
     if (ehdr->e_shoff > off) ehdr->e_shoff += sz;
     if (ehdr->e_phoff > off) ehdr->e_phoff += sz;
 
-    lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, struct _1Dlsd_entry *e) {
+    lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, void *_) {
         if (_contain_(_p->p_offset, _p->p_filesz, off)) {
             _p->p_memsz     += sz;
             _p->p_filesz    += sz;
@@ -125,12 +164,21 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
             _p->p_vaddr     += sz;
         }
     });
-    lyss.feach(ELF_Shdr, [&](Elf64_Shdr *sec, struct _1Dlsd_entry *e) {
+    lyss.feach(ELF_Shdr, [&](Elf64_Shdr *sec, void *_) {
         if (_contain_(sec->sh_offset, sec->sh_size, off)) {
             sec->sh_size    += sz;
         } else if (sec->sh_offset >= off) {
             sec->sh_addr    += sz;
             sec->sh_offset  += sz;
+        }
+    });
+
+    // elf.ehdr->e_entry = h.orig_vtov(&elf, elf.ehdr->e_entry);
+    lyss.feach(ELF_Dyn, [&](Elf64_Dyn *dyn, void *_) {
+        if (dyn_is_ptr(dyn)) {
+            dyn->d_un.d_ptr =
+                lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr);
+            DBG_FMT("%lx!!!\n", lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr));
         }
     });
 }

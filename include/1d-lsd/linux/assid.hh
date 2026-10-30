@@ -35,11 +35,10 @@ struct XLyss : public Lyss {
 
     XLyss(x1Dlsd *xlsd, std::shared_ptr<ElfObj> elf);
 
-    __u64 get_size(enum _1DLSD_TYPE t) override {
-        return _get_size(t);
-    }
+    __u64 MemConv(Binary_t*, MemConvType, __u64, MemConvType) override;
+    __u64 get_size(enum _1DLSD_TYPE t) override;
+
 private:
-    __u64 _get_size(enum _1DLSD_TYPE t);
     void align_bin(__u64 off, __u64 sz) override;
 };
 
