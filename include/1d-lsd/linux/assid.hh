@@ -46,16 +46,13 @@ private:
 class x1Dlsd : public _1Dlsd {
 public:
     XLyss     xlyss;
-    x1Dlsd(acid_pass& _pass, std::shared_ptr<ElfObj> elfptr)
-        :   _1Dlsd(nullptr, _pass),
-            xlyss(this, elfptr)
+    x1Dlsd(acid_pass *_pass, std::shared_ptr<ElfObj> elfptr)
+        :   xlyss(this, elfptr), _1Dlsd(_pass, elfptr)
     {
-        dynamic_cast<_1Dlsd*>(this)->lyss = dynamic_cast<Lyss*>(&xlyss);
+        set_lyss(dynamic_cast<Lyss*>(&xlyss));
     }
 
-    // void run() override {
-    //     pass._init_(this);
-    // }
+    void run() override;
 };
 };
 #endif

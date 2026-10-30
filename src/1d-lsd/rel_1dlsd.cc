@@ -60,7 +60,7 @@ void _1Dlsd::make(char *f) {
 
             }
         }
-        DBG_FMT("        -> @0x%llx - size 0x%lx\n", off, e.mm->sz);
+        // DBG_FMT("        -> @0x%llx - size 0x%lx\n", off, e.mm->sz);
         out.pwrite(e.mm->mem, e.mm->sz, off);
     }
 }

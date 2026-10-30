@@ -30,6 +30,7 @@ static char *SC =
 	"\xcc\xcc";
 
 LSD_STATUS ObfuscA::_init_(XLSD *lsd) {
+	puts("++");
 	// auto phdr_st = lsd->lyss.get_by_type(ELF_Phdr, 0);
 	// assert(!!phdr_st);
 	// lsd->lyss.insert(
@@ -76,7 +77,7 @@ LSD_STATUS ObfuscA::_init_(XLSD *lsd) {
 int main(int argc, char **argv) {
 	auto elf = std::make_shared<SYX::ElfObj>(const_cast<char*>("./specimen/a.out"), ELF_SYMTAB_DIR);
 	auto pass = ObfuscA();
-	auto lsd = SYX::x1Dlsd(pass, elf);
+	auto lsd = SYX::x1Dlsd(&pass, elf);
 	lsd.run();
 	lsd.make("/tmp/hello.out");
 	// lsd.run();

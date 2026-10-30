@@ -1,3 +1,6 @@
+#if defined(__linux__)
+#include <elf.h>
+#endif
 #include <map>
 #include <memory>
 #include <vector>
@@ -6,7 +9,6 @@ extern "C" {
     #include "./binary.h"
     #include "./1dlsd.h"
 };
-#include "./linux/assid.hh"
 #include "./binary.hh"
 #include "../common/mem.hh"
 #include "../syx86/syx86.hh"
@@ -46,7 +48,7 @@ public:
 
     /**
      * Linux    */
-    Lyss() = default;
+    Lyss() = delete;
     Lyss(_1Dlsd *dlsd, Binary_t& _bin) : ____lsd{dlsd}, bin{_bin} {}
     Lyss(x1Dlsd *dlsd, Binary_t& _bin) : nix_lsd{dlsd}, bin{_bin} {}
     virtual ~Lyss() {
@@ -121,11 +123,11 @@ public:
 
 protected:
     virtual __u64 get_size(enum _1DLSD_TYPE t) {
-        static_assert("You shall've implemented this!");
+        assert(0);//, "You shall've implemented this!"
     };
     void align_map(__u64 off, __u64 sz);
     virtual void align_bin(__u64 off, __u64 sz) {
-        static_assert("You Should've implement this!");
+        assert(0);//, "You Should've implement this!"
     }
 
     friend class _1Dlsd;
@@ -150,10 +152,10 @@ namespace SlitYaX86 {
 class _1Dlsd : public _1Dlsd_pack_t {
     Disass          d;
 public: // sorry.. - NO, this is !FUCKED!
-    acid_pass&      pass;
+    acid_pass       *pass;
     Lyss            *lyss;
-    _1Dlsd(Lyss *_lyss, acid_pass& _pass)
-        : lyss{_lyss}, pass{_pass}, _1Dlsd_pack_t{0}
+    _1Dlsd(acid_pass *_pass, std::shared_ptr<ElfObj> elfobj)
+        : pass{_pass}, _1Dlsd_pack_t{0}
     {
         llist_init(&ll_px,    sizeof(struct _1Dlsd_entry));
         llist_init(&ll_rel,   sizeof(struct rel_yayo));
@@ -161,15 +163,13 @@ public: // sorry.. - NO, this is !FUCKED!
     };
     virtual ~_1Dlsd() = default;
 
+    void set_lyss(Lyss *l) { lyss=l; }
     template<enum _1DLSD_TYPE T, typename Fn>
     void parse(Fn fn) {
         for (auto& [off, e] : lyss->map)
             if (e.t == T) fn(off, e);
     }
-    void run() {
-        static_assert("This is just wrong, Or not");
-    }
-
+    virtual void run() = 0;
     void make(char *f);
 };
 };

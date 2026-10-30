@@ -134,5 +134,7 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
         }
     });
 }
-
+void x1Dlsd::run() {
+    pass->_init_(this);
+}
 };
