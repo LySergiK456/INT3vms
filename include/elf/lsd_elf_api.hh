@@ -4,11 +4,11 @@
 using T = bin_hdr_t;
 
 struct _elf_object : public SlitYaX86::ElfObj {
-	T      ehdr;
-	T      phdr;
-	T      shdr;
-	T      dynamic;
-    T       interp;
+	T  ehdr;
+	T  phdr;
+	T  shdr;
+	T  dynamic;
+    T  interp;
 	LLIST_OF(T)    ll_symtab;
 	LLIST_OF(T)    ll_dyntab;
 	LLIST_OF(T)    ll_rela;

@@ -135,5 +135,4 @@ typedef struct _elfobj_t {
             !!dyn->d_tag && !!dyn->d_un.d_val;	\
             dyn++)
 
-
 #endif

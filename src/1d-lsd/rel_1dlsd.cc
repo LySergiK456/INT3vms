@@ -66,11 +66,61 @@ __u64 Lyss::MemBase(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
             }
         }
     }
-    for (auto& [lsd_off, emm] : map) {
-        printf("[] %p %p %p\n", emm.src.off, emm.src.sz, offset);
-    }
-    xx(offset);
+
     return -1;
+}
+
+struct _1Dlsd_entry *
+Lyss::make_entry(
+    Binary_t            *img,
+    enum _1DLSD_TYPE    t,
+    bin_hdr_t&          v,
+    bool                new_mm=false)
+{
+    struct _1Dlsd_entry *ent = new struct _1Dlsd_entry;
+    tofree.push_back(ent);
+
+    *ent = (struct _1Dlsd_entry){
+        .t=t, .src={img, v.off, v.mm.sz}, .dst={v.off, v.mm.sz}
+    };
+    ent->mm = (!new_mm) ? &v.mm : new mm_t(v.mm);
+    if (!!new_mm) tofree.push_back(ent->mm);
+    return ent;
+}
+
+struct _1Dlsd_entry *
+Lyss::make_entry_extra(
+    Binary_t            *img,
+    enum _1DLSD_TYPE    t,
+    bin_hdr_t&          v,
+    __u64               off,
+    __u64               size)
+{
+    struct _1Dlsd_entry *ent = new struct _1Dlsd_entry;
+    tofree.push_back(ent);
+    
+    *ent = (struct _1Dlsd_entry){
+        .t=t, .mm=new mm_t(v.mm), .src={img, off, size}, .dst={off, size}
+    };
+    tofree.push_back(ent->mm);
+    return ent;
+}
+
+LSD_API void Lyss::push(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t& v) {
+    if (!v.mm.sz) return;
+
+    for (auto& [off, entry] : map) {
+        if (!!_crossed_(entry.dst.off, entry.dst.sz, v.off, v.mm.sz))
+        {
+            return;
+        }
+    }
+
+    map[v.off] = *make_entry(img, t, v);
+}
+LSD_API void Lyss::push_ptr(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t *&&v) {
+    tofree.push_back((void*)v);
+    push(img, t, *v);
 }
 };
 

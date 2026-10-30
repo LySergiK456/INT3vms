@@ -63,21 +63,8 @@ public:
         for (auto& e : tofree) delete e;
     }
 
-    LSD_API void push_ptr(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t *&&v) {
-        tofree.push_back((void*)v);
-        push(img, t, *v);
-    }
-    LSD_API void push(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t& v) {
-        if (!v.mm.sz) return;
-        for (auto& [off, entry] : map) {
-            if (!!_crossed_(entry.dst.off, entry.dst.sz, v.off, v.mm.sz)) {
-                return;
-            }
-        }
-        map[v.off] = (struct _1Dlsd_entry){
-            .t=t, .mm=&v.mm, .src={img, v.off, v.mm.sz}, .dst={v.off, v.mm.sz}
-        };
-    }
+    LSD_API void push_ptr(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t *&&v);
+    LSD_API void push(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t& v);
     Generic(Fn) int feach(enum _1DLSD_TYPE t, Fn fn) {
         return feach(t, nullptr, fn);
     }
@@ -114,7 +101,7 @@ public:
         struct _1Dlsd_entry px = {
             .dst = {
                 .off= nth * sizeof(EntryT),
-                .sz = (!!e) ? sizeof(EntryT) : size
+                .sz = !!e ? sizeof(EntryT) : size
             },
             .raw_mem = mem,
         };
@@ -150,6 +137,9 @@ protected:
     virtual void align_bin(__u64 off, __u64 sz) {
         assert(0);//, "You Should've implement this!"
     }
+private:
+    struct _1Dlsd_entry *make_entry(Binary_t*, enum _1DLSD_TYPE, bin_hdr_t&, bool);
+    struct _1Dlsd_entry *make_entry_extra(Binary_t*, enum _1DLSD_TYPE, bin_hdr_t&, __u64, __u64);
 
     friend class _1Dlsd;
     friend class XLyss;

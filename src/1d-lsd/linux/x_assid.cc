@@ -33,7 +33,7 @@ namespace SlitYaX86
                 new_lyss(
                     pMem,
                     dyn_off + (dyn_count++*sizeof(Elf64_Dyn)),
-                    sizeof(Elf64_Dyn)));            
+                    sizeof(Elf64_Dyn)));
         }
 
         __u64 ph_ndx{};
@@ -90,16 +90,17 @@ __u64 XLyss::MemConv(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
     __u64 ret{-1};
 
     lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, void *_) {
+        __u64 base = (dst_type == MT::Virt) ? _p->p_vaddr : _p->p_offset;
         switch (src_type) {
         case MT::Virt:
             if (_contain_(_p->p_vaddr, ALIGN_UP(_p->p_memsz, _p->p_align), value)) {
-                ret=_p->p_vaddr + (value - _p->p_vaddr);
+                ret=base + (value - _p->p_vaddr);
                 return;
             }
             break;
         case MT::Off:
-            if (_contain_(_p->p_offset, _p->p_filesz+1, value)) {
-                ret=_p->p_offset + (value - _p->p_offset);
+            if (_contain_(_p->p_offset, ALIGN_UP(_p->p_filesz, _p->p_align), value)) {
+                ret=base + (value - _p->p_offset);
                 return;
             }
             break;
