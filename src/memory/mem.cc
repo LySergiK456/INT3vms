@@ -184,25 +184,25 @@ uc_err Ldr::mmap(__u64 virt, __u64 size, __u32 perm) {
  **/
 #if defined(_WIN32)
 namespace SlitYaX86 {
-__u64 Ldr::AllocUcStr(uc_engine *uc, char *str) {
+__u64 Ldr::AllocUcStr(char *str) {
     __u64 s_len = strlen(str) + 1;
     wchar_t wstr[0x200]{};
 
     for (__u64 i = 0; i < s_len; i++)
         wstr[i] = static_cast<__u16>(str[i]);
 
-    return AllocUcStr(uc, wstr);
+    return AllocUcStr(wstr);
 }
 
-__u64 Ldr::AllocUcStr(uc_engine *uc, wchar_t *wstr) {
+__u64 Ldr::AllocUcStr(wchar_t *wstr) {
     __u64 len = wcslen(wstr) * sizeof(wchar_t);
-    auto uni = (_UNICODE_STRING_ *)uc_malloc(uc, sizeof(_UNICODE_STRING_));
-    __u64 virt_buf = uc_malloc(uc, len + 2);
+    auto uni = (_UNICODE_STRING_ *)uc_malloc(sizeof(_UNICODE_STRING_));
+    __u64 virt_buf = uc_malloc(len + 2);
 
-    mwrite(uc, &uni->Length, (__u16)(len));
-    mwrite(uc, &uni->MaximumLength, (__u16)(len + sizeof(wchar_t)));
-    mwrite(uc, &uni->Buffer, (void *)(virt_buf));
-    mmemcpy(uc, virt_buf, wstr, len);
+    mwrite(&uni->Length, (__u16)(len));
+    mwrite(&uni->MaximumLength, (__u16)(len + sizeof(wchar_t)));
+    mwrite(&uni->Buffer, (void *)(virt_buf));
+    mmemcpy(virt_buf, wstr, len);
 
     return reinterpret_cast<__u64>(uni);
 }

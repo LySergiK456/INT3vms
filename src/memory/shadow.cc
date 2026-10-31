@@ -1,8 +1,8 @@
+#include <assert.h>
+#include <type_traits>
 #include "../../include/conf.hh"
 #include "../../include/syx86/syx86.hh"
 #include "../../include/syx86/uc.hh"
-#include <assert.h>
-#include <type_traits>
 
 template <typename P> static int _write_value(P *addr, auto v);
 
@@ -134,14 +134,3 @@ template <typename P> static int _write_value(P *addr, auto v) {
 
     return 0;
 }
-
-namespace SlitYaX86 {
-shadow_mem_t *Ldr::VAtoShadow(__u64 virt) {
-    for (auto sh_mem : shadow) {
-        if (!!_contain_(sh_mem->uc_mem->addr, sh_mem->uc_mem->size, virt)) {
-            return sh_mem;
-        }
-    }
-    return nullptr;
-}
-};

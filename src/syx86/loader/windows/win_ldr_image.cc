@@ -2,6 +2,7 @@
 #include <windows.h>
 // #include <ntifs.h>
 #include "../../../../include/syx86/syx86.hh"
+#include "../../../../include/syx86/loader/windows/win_ldr.hh"
 #include "../../../../include/syx86/uc.hh"
 
 namespace SlitYaX86 {

@@ -1,4 +1,5 @@
 #include "../../../../include/syx86/syx86.hh"
+#include "../../../../include/syx86/loader/windows/win_ldr.hh"
 #include "../../../../include/syx86/uc.hh"
 #include <stddef.h>
 #include <windows.h>
@@ -14,16 +15,16 @@ uc_err WinLdr::InitProcEnv() {
     err = init_stack(stack_base, STACK_SIZE);
     if (!_uc_okay(err, ok))
         return err;
+xx(1);
 
     err = init_gs_fs(_gs, _fs);
     if (!_uc_okay(err, ok))
         return err;
-
     mmap(proc.teb_addr, PAGE_ALIGN_UP(sizeof(_TEB_)), UC_PROT_RW, "[TEB]");
     mmap(proc.peb_addr, PAGE_ALIGN_UP(sizeof(_PEB_)), UC_PROT_RW, "[PEB]");
     mmap(proc.ldr_addr, PAGE_ALIGN_UP(sizeof(_PEB_LDR_DATA_)), UC_PROT_RW);
     mmap(proc.kusd_addr,PAGE_ALIGN_UP(sizeof(_KUSER_SHARED_DATA_)), UC_PROT_RW);
-
+xx(2);
     initTEB();
     initPEB();
     initLDR();

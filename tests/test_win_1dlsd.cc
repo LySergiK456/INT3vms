@@ -20,7 +20,8 @@ struct WObfuscA
 };
 
 int main() {
-	auto pe = std::make_shared<PE64>(const_cast<char*>("./specimen/b.exe"), PE_SYMTAB_DIR);
+	// _pe64_image
+	auto pe = std::make_shared<PE64>("./specimen/b.exe", PE_SYMTAB_DIR);
 	auto pass = WObfuscA();
 	// make arg=pass a reference
 	auto lsd = SYX::w1Dlsd(&pass, pe);

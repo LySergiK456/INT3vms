@@ -153,16 +153,16 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
     assert(!!e_ehdr);
 
     auto ehdr = (Elf64_Ehdr*)e_ehdr->mm->mem;
+    ehdr->e_entry =
+        lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), ehdr->e_entry);
+        
     if (ehdr->e_shoff > off) ehdr->e_shoff += sz;
     if (ehdr->e_phoff > off) ehdr->e_phoff += sz;
 
-    // elf.ehdr->e_entry = h.orig_vtov(&elf, elf.ehdr->e_entry);
     lyss.feach(ELF_Dyn, [&](Elf64_Dyn *dyn, void *_) {
-        if (dyn_is_ptr(dyn)) {
-            DBG_FMT("%lx %lx!!!\n", dyn->d_un.d_ptr, lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr));
+        if (dyn_is_ptr(dyn))
             dyn->d_un.d_ptr =
                 lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr);
-        }
     });
 
     lyss.feach(ELF_Phdr, [&](Elf64_Phdr *_p, void *_) {

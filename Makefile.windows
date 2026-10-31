@@ -8,7 +8,7 @@ X86_LDFLAGS=-L./x86disass/build/windows
 UC_CFLAGS =	-I/home/rax/Documents/unicorn/include
 UC_LDFLAGS =-L/home/rax/Documents/unicorn/build
 
-objs = shellcode.o dexverse.o win_syscall.o wine_tabl.o win10_tabl.o main.o dex.o razor.o win_ldr.o win_ldr_mem.o win_ldr_image.o win_ldr_env.o syx86.o uc.o pe64.o util.o utils.o llist.o lsd_pe32.o rel_yayo.o rel_1dlsd.o xtc.o extc.o #dbgserver.o
+objs = syx86.o shadow.o mem.o w_assid.o shellcode.o win_syscall.o wine_tabl.o win10_tabl.o main.o dex.o dexverse.o razor.o win_ldr.o win_ldr_image.o win_ldr_env.o uc.o pe64.o util.o utils.o llist.o lsd_pe32.o # rel_yayo.o rel_1dlsd.o xtc.o extc.o #dbgserver.o
 _1dlsd_objs = test_win_1dlsd.o w_assid.o shellcode.o uc.o pe64.o util.o utils.o llist.o lsd_pe32.o rel_1dlsd.o #xtc.o extc.o
 
 CXXFLAGS = -w -g -MMD -MP

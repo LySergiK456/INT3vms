@@ -1,6 +1,6 @@
-#include "../../include/syx86/syx86.hh"
 #include <assert.h>
 #include <windows.h>
+#include "../../include/syx86/dex/dex.hh"
 extern "C" {
     #include "../../include/common/utils.h"
     #include "../../include/syx86/syscall/windows/win_syscall.h"

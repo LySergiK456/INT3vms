@@ -1,4 +1,5 @@
 #include "../../../../include/syx86/syx86.hh"
+#include "../../../../include/syx86/loader/windows/win_ldr.hh"
 #include <ntdef.h>
 #include <unicorn/unicorn.h>
 #include <windows.h>

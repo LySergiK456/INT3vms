@@ -6,9 +6,9 @@ NASM = ccache nasm
 X86_CFLAGS=	-lx86disass
 UC_CFLAGS =	-lunicorn
 
-objs = linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o
+objs = syx86.o linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o
 vm_objs = linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o self_maps.o
-_1dlsd_objs = core_yayo.o test_linux_1dlsd.o linux_ldr.o self_maps.o yayo.o shellcode.o uc.o elf.o util.o utils.o llist.o rel_1dlsd.o mem.o shadow.o x_assid.o #win_assid.o #rel_yayo.o
+_1dlsd_objs = syx86.o core_yayo.o test_linux_1dlsd.o linux_ldr.o self_maps.o yayo.o shellcode.o uc.o elf.o util.o utils.o llist.o rel_1dlsd.o mem.o shadow.o x_assid.o #win_assid.o #rel_yayo.o
 
 CXXFLAGS = -w -g -MMD -MP -lunicorn -lx86disass
 CFLAGS = -w -g -MMD -MP -lunicorn -lx86disass

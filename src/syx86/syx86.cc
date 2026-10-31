@@ -16,7 +16,8 @@ namespace SlitYaX86 {
     }
 };
 
-__s8 SlitYaX86::wine_name(char *ret, __u64 size, char *dll_name) {
+namespace SlitYaX86 {
+__s8 wine_name(char *ret, __u64 size, char *dll_name) {
 #if defined (_WIN32)
     if (!ret)
         return -1;
@@ -35,4 +36,5 @@ __s8 SlitYaX86::wine_name(char *ret, __u64 size, char *dll_name) {
 
     return 0;
 #endif
+};
 }
