@@ -1,6 +1,9 @@
 #include "../../include/1d-lsd/1dlsd.hh"
 #include "../../include/conf.hh"
 #include "../../include/common/utils.hh"
+extern "C" {
+    #include "../../include/common/llist.h"
+};
 // extern "C" {
 //     #include "../../include/1d-lsd/yayo.h"
 // };
@@ -187,6 +190,50 @@ void Lyss::align_map(__u64 off, __u64 sz) {
     map = std::move(out);
 }
 
+LSD_API
+void
+Lyss::insert(
+    enum _1DLSD_TYPE    t,
+    void                *mem,   // Shellcode, whatever
+    __u64               size,   // size of mem/data
+    __u64               offset,    // offset
+    void               *tab,    // in case of Phdr/Ehdr/Dynamic
+    __u32               nth,    // tab[nth]
+    void                *e)     // the fucking entry
+{
+    xx(offset);
+    // tab=nullptr;
+    // e=nullptr;
+    // if (!!tab) {
+    //     if (llist_empty(&tab->px))
+    //         llist_init(&tab->px, sizeof(struct _1Dlsd_entry));
+    // }
+
+    struct _1Dlsd_entry px = {
+        .dst = {
+            .off= offset,//(!!e ? nth * sizeof(EntryT) : off),
+            .sz = size//(!!e ? sizeof(EntryT) : size)
+        },
+        .raw_mem = mem,
+    };
+
+    if (!tab) {
+        // llist_push((_LL_TYPE_*)&tab->px, px);
+    } else {
+        for (auto& [off, entry] : map)
+            if (!!_contain_(off, entry.mm->sz, off)) {
+                if (llist_empty(&entry.px))
+                    llist_init(&entry.px, sizeof(struct _1Dlsd_entry));
+
+                llist_push((_LL_TYPE_*)&entry.px, &px);
+                break;
+            }
+    }
+    __u64 out_off = offset;//((!!tab) ? tab->dst.off + px.dst.off : off);
+    align_map(out_off, px.dst.sz);
+    align_bin(out_off, px.dst.sz);
+}
+
 /**
  * Build the binary
 **/
@@ -195,15 +242,13 @@ void _1Dlsd::make(char *f) {
 
     DBG_FMT("-[_1Dlsd]-\t~[+]~ Dumping to [%s]\n", f);
     for (auto& [off, e] : lyss->map) {
-        // if (!llist_empty(&e.px))
-        // {
-        //     ll_each_value(&e.px, patch)
-        //     {
-
-        //     }
-        // }
-        if (e.t == ELF_Dyn)
-            DBG_FMT("        -> @0x%llx - size 0x%lx\n", off, e.mm->sz);
+        if (!llist_empty(&e.px)) {
+            ll_each_value(&e.px, px) {
+                // DBG_FMT("~> @0x%llx - size 0x%lx\n", px->dst.off, px->dst.sz);
+                out.pwrite(px->raw_mem, px->dst.sz, px->dst.off);
+            }
+        }
+        // DBG_FMT("-> @0x%llx - size 0x%lx\n", off, e.mm->sz);
         out.pwrite(e.mm->mem, e.mm->sz, off);
     }
 }

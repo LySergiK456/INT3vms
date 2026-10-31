@@ -10,7 +10,7 @@ namespace SlitYaX86
 {
     XLyss::XLyss(x1Dlsd *xlsd, std::shared_ptr<ElfObj> elf)
         :   Lyss(xlsd, *dynamic_cast<Binary_t*>(elf.get())),
-            lsd{xlsd},base_elf{elf}
+            lsd{xlsd}, base_elf{elf}
     {
         Binary_t *bin = dynamic_cast<Binary_t*>(elf.get());
         void *pMem = elf->mem;

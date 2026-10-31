@@ -15,7 +15,6 @@ uc_err WinLdr::InitProcEnv() {
     err = init_stack(stack_base, STACK_SIZE);
     if (!_uc_okay(err, ok))
         return err;
-xx(1);
 
     err = init_gs_fs(_gs, _fs);
     if (!_uc_okay(err, ok))
@@ -24,7 +23,7 @@ xx(1);
     mmap(proc.peb_addr, PAGE_ALIGN_UP(sizeof(_PEB_)), UC_PROT_RW, "[PEB]");
     mmap(proc.ldr_addr, PAGE_ALIGN_UP(sizeof(_PEB_LDR_DATA_)), UC_PROT_RW);
     mmap(proc.kusd_addr,PAGE_ALIGN_UP(sizeof(_KUSER_SHARED_DATA_)), UC_PROT_RW);
-xx(2);
+
     initTEB();
     initPEB();
     initLDR();

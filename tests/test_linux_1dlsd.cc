@@ -33,12 +33,13 @@ LSD_STATUS ObfuscA::_init_(XLSD *lsd) {
 	// auto phdr_st = lsd->lyss->get_by_type(ELF_Phdr, 0);
 	// assert(!!phdr_st);
 	// lsd->lyss->insert(
-	// 	ELF_Phdr,	// Type
+	// 	LSD_NONE,	// Type
 	// 	(void*)SC,	// The fucking shellcode which shall reide as a Phdr Entry
 	// 	56,			// SizeOf Shellcode
-	// 	phdr_st,	// struct _1Dlsd_entry *
+	// 	0x1000,
+	// 	(void*)phdr_st,	// struct _1Dlsd_entry *
 	// 	0,			// very first of all PHDR's
-	// 	reinterpret_cast<Elf64_Phdr*>(phdr_st->mm->mem)	// Needs the fucking typecasting
+	// 	reinterpret_cast<void*>(phdr_st->mm->mem)	// Needs the fucking typecasting
 	// );
 	lsd->parse<ELF_Phdr>([&](__u64 off, struct _1Dlsd_entry& e) {
 		auto p = reinterpret_cast<Elf64_Phdr*>(e.mm->mem);

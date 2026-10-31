@@ -1,0 +1,111 @@
+#include "../../../include/1d-lsd/1dlsd.h"
+#include "../../../include/1d-lsd/yayo.h"
+    
+#define is_ok(x) ((x) != -1)
+
+#define x8664_each(in, i, src, size)    \
+        foreach_instr_off(X86_64, in, i, (src), (size))
+
+#define _x86_64_insn(in, sc)     init_instr(X86_64, (in), (sc))
+
+static void *yayo_src_mem(struct rel_yayo *ctx) {
+    switch (ctx->t) {
+        case YAYO_BIN:
+            return ctx->bin.bin->src.map + ctx->bin.offset;
+        default: goto fail;
+    }
+    
+    fail:
+    return NULL;
+}
+
+#define YAYO_EACH_PX(px, __e__) \
+        ll_each_value(px, __e__)
+
+static inline YAYO_INTERNAL __u64 rip_imm(instr_dat_t *insn, struct yayo_px *px, __u64 offset);
+
+// extern "C" {
+static YAYO_INTERNAL
+__s8 rel_do_px(
+    struct rel_yayo *ctx,
+    struct yayo_px  *_px_,
+    mm_t            *mm)
+{
+    __u64 i = 0;
+    void *src_mem   = yayo_src_mem(ctx);
+    __u64 align     = lsd_align(ctx->lsd, ctx->out.off);
+    instr_dat_t tmp;
+
+    x8664_each(insn, i, src_mem, ctx->bin.size) {
+        __u64 offset        = _px_->dst_off + i;
+        __u64 base_offset   = offset;
+
+        YAYO_EACH_PX(&_px_->ll_yayo_px, sub_px)
+            if (sub_px->dst_off == offset)
+                if (!is_ok(rel_do_px(ctx, sub_px, mm))) {
+                    return -1;
+                }
+
+        do  /** *** **** * ** ******** **************** **/
+        {   /** The Core - of Rel(insn relocation)-Yayo **/
+            /** *** **** * ** ******** **************** **/
+            offset += y_full_align(ctx, 0, offset);
+            void *ptr   = mm->mem + offset;
+            __u64 out_base  = offset += ctx->out.align;    // Here is the Funky shit
+
+            __u64 orig_imm = rip_imm(&insn, _px_, i);
+            __u64 dest_imm = orig_imm + y_full_align(ctx, base_offset, insn.in_sz) - align;
+            if (!get_rip_imm_oper(&insn))
+            {   /** No (RIP/ PTR [reg]) operand **/
+                memcpy(ptr, src_mem+i, insn.in_sz);
+                continue;
+            }
+
+            struct yayo_px *dst_px = y_orig_px(ctx, dest_imm + align);
+            if (!dst_px) {
+                dest_imm += lsd_align(ctx->lsd, orig_imm);
+                _StickInsn(&insn,  ptr, (dest_imm - ctx->bin.offset), out_base);
+                break;
+            }
+
+            struct xtc_px *_xtc = y_xtc_px(&ctx->ll_xtc_px, base_offset);
+            if (!!_xtc) {
+                *(&tmp) = (typeof(tmp)){0};
+                _x86_64_insn(&tmp, _xtc->sc);
+                _StickInsn(&tmp, ptr, dest_imm, base_offset);
+                break;
+            }
+
+            _StickInsn(&insn, ptr, dest_imm, base_offset);
+        } while(0);
+    }
+}
+// };
+
+/**
+ *  get RIP ptr value
+**/
+static inline YAYO_INTERNAL __u64 rip_imm(instr_dat_t *insn, struct yayo_px *px, __u64 offset) {
+    __u64 imm = 0;
+    get_rip_ptr_addr(insn, px->orig_off + offset, &imm);
+    return 0;
+}
+
+YAYO_API y_full_align(struct rel_yayo *ctx, __u64 from, __u64 to) {
+    return 0;
+}
+
+YAYO_API __s8 YAYO_MAKE(struct rel_yayo *ctx) {
+    /* make mm_t */
+    mm_t *mm_out = xmalloc(sizeof(mm_t));
+    mm_out->t   = MM_HEAP;
+    mm_out->mem = xmalloc(0x21000);
+    mm_out->sz  = 0x21000;
+
+    YAYO_EACH_PX(&ctx->ll_yayo_px, px) {
+        if (!is_ok(rel_do_px(ctx, px, mm_out)))
+            return -1;
+    }
+
+    return 0;
+}

@@ -88,6 +88,6 @@ namespace SlitYaX86
 		uc_err load_new_elf(std::shared_ptr<ElfObj> elf, __u64 base);
 	};
 
-	static bool ElfIsSupported(std::shared_ptr<ElfObj> elf);
+	static bool ElfIsSupported(ElfObj& elf);
 };
 #endif

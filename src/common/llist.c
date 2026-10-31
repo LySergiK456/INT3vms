@@ -14,8 +14,7 @@ void llist_init(void *ll_ptr, __u64 size) {
 }
 
 void *llist_push(_LL_TYPE_ *ll, void *dat) {
-    if (!ll)
-        return NULL;
+    if (!ll) return NULL;
 
     LLIST_SZ(ll->sz) *new = malloc(sizeof(*ll));
     new->sz = ll->sz;

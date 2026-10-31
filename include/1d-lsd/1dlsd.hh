@@ -84,34 +84,9 @@ public:
         return i;
     }
 
-    template<typename TablT, typename EntryT>
-    LSD_API void insert(
-        enum _1DLSD_TYPE    t,
-        void                *mem,   // Shellcode, whatever
-        __u64               size,   // size of mem/data
-        TablT               *tab,   // in case of Phdr/Ehdr/Dynamic
-        __u32               nth,    // tab[nth]
-        EntryT*             e)      // the fucking entry
-    {
-        if (llist_empty(&tab->px)) {
-            llist_init(&tab->px, sizeof(struct _1Dlsd_entry));
-        }
+    LSD_API void insert(enum _1DLSD_TYPE, void*, __u64, __u64, void*, __u32, void*);
 
-        struct _1Dlsd_entry px = {
-            .dst = {
-                .off= nth * sizeof(EntryT),
-                .sz = !!e ? sizeof(EntryT) : size
-            },
-            .raw_mem = mem,
-        };
-
-        llist_push((_LL_TYPE_*)&tab->px, &px);
-        align_map(tab->dst.off + px.dst.off, px.dst.sz);
-        align_bin(tab->dst.off + px.dst.off, px.dst.sz);
-    }
-
-    virtual
-    __u64 MemConv(Binary_t*, MemConvType, __u64, MemConvType) = 0;
+    virtual __u64 MemConv(Binary_t*, MemConvType, __u64, MemConvType) = 0;
     __u64 MemBase(Binary_t*, MemConvType, __u64, MemConvType);
 
     LSD_API __u64 orig_vtov(Binary_t*, __u64);

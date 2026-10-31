@@ -1,9 +1,11 @@
 #include "../../include/syx86/syx86.hh"
 #include <assert.h>
+#if defined(_WIN32)
 #include <windows.h>
 extern "C" {
     #include "../../include/syx86/syscall/windows/win_syscall.h"
 };
+#endif
 
 namespace SlitYaX86 {
     shadow_mem_t *Ldr::VAtoShadow(__u64 virt) {

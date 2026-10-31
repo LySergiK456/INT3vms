@@ -31,11 +31,11 @@ typedef LLIST_SZ(8)     _LL_TYPE_;
 #define _LL_            (_LL_TYPE_*)
 
 #define ll_each(ll, e)                                                         \
-    for (typeof((ll)) e = (ll)->next; !!e && e != (ll); e = e->next)
+    for (typeof((ll)) e = (ll)->next; !!e && !!e->v && e != (ll); e = e->next)
 
 #define ll_each_value(ll, e)                \
     ll_each(_LL_ (ll), _##e##_)             \
-        for (typeof((ll)->v) e=(typeof((ll)->v))(_##e##_)->v; !!e; e=NULL)
+        for (typeof((ll)->v) e=(typeof((ll)->v))((_##e##_)->v); !!e; e=NULL)
 
 #define LLIST_TWINE(last, new)                                                 \
     ({                                                                         \
@@ -44,7 +44,7 @@ typedef LLIST_SZ(8)     _LL_TYPE_;
         last->next = (new);                                                    \
     })
 
-#define llist_empty(ll) ((ll)->next == (ll))
+#define llist_empty(ll) ((ll)->next == (ll) || !(ll)->next)
 
 void llist_init(void *ll_ptr, __u64 size);
 void *llist_push(_LL_TYPE_ *ll, void *dat);

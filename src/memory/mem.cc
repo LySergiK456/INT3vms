@@ -151,7 +151,6 @@ namespace SlitYaX86 {
 uc_err Ldr::mmap(__u64 virt, __u64 size, __u32 p, char *name) {
     __u64 base_virt = VIRT_SHADOW_BASE + virt;
     assert(!(virt & 0xfff) && !!size);
-
     uc_err err = uc_map_fxd(virt, size, p);
     if (!_uc_okay(err, ok))
         return err;
@@ -166,7 +165,7 @@ uc_err Ldr::mmap(__u64 virt, __u64 size, __u32 p, char *name) {
 
     do {
         virt_map_fxd(reinterpret_cast<__u64>(sh_mem->addr), size, sh_mem->perm);
-        _zero_memory(sh_mem->addr, sh_mem->size);
+        // _zero_memory(sh_mem->addr, sh_mem->size);
     } while (0);
     pmem_maps.emplace_back(sh_mem->uc_mem);
     shadow.push_back(sh_mem);

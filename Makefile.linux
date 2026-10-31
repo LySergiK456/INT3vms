@@ -6,9 +6,9 @@ NASM = ccache nasm
 X86_CFLAGS=	-lx86disass
 UC_CFLAGS =	-lunicorn
 
-objs = syx86.o linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o
-vm_objs = linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o self_maps.o
-_1dlsd_objs = syx86.o core_yayo.o test_linux_1dlsd.o linux_ldr.o self_maps.o yayo.o shellcode.o uc.o elf.o util.o utils.o llist.o rel_1dlsd.o mem.o shadow.o x_assid.o #win_assid.o #rel_yayo.o
+objs = syx86.o linux_main.o linux_ldr.o linux_ldr_env.o elf.o utils.o llist.o uc.o mem.o shadow.o rel_yayo.o
+vm_objs = syx86.o linux_main.o linux_ldr.o linux_ldr_env.o elf.o utils.o llist.o uc.o mem.o shadow.o self_maps.o rel_yayo.o
+_1dlsd_objs = syx86.o core_yayo.o test_linux_1dlsd.o linux_ldr.o self_maps.o yayo.o shellcode.o uc.o elf.o util.o utils.o llist.o rel_1dlsd.o mem.o shadow.o x_assid.o rel_yayo.o #win_assid.o #
 
 CXXFLAGS = -w -g -MMD -MP -lunicorn -lx86disass
 CFLAGS = -w -g -MMD -MP -lunicorn -lx86disass
@@ -92,6 +92,13 @@ make_builddir:
 
 %.o: ./src/1d-lsd/%.cc
 	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(GXXFLAGS)
+
+%.o: ./src/1d-lsd/rel_yayo/%.c
+	$(GCC) -c $< -o $(BDIR)/$@ $(CFLAGS)
+
+%.o: ./src/1d-lsd/rel_yayo/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(GXXFLAGS)
+
 
 %.o: ./src/1d-lsd/linux/%.cc
 	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(GXXFLAGS)

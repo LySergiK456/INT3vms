@@ -97,7 +97,7 @@ __u32 DirExists(char *dir) {
 int __wr_init(void *addr, __u64 size, __u32 *perm) {
 #if defined(_WIN32)
     return VirtualProtect(PAGE_ALIGN_DOWN(addr), PAGE_ALIGN_UP(size),
-                              PAGE_READWRITE, perm);
+        PAGE_READWRITE, perm);
 #endif
 #if defined(__linux__)
     *perm = UnixMemQuery(PAGE_ALIGN_DOWN(addr));
@@ -107,8 +107,8 @@ int __wr_init(void *addr, __u64 size, __u32 *perm) {
 
 int __wr_exit(void *addr, __u64 size, __u32 perm) {
 #if defined(_WIN32)
-    return VirtualProtect(PAGE_ALIGN_DOWN(addr), PAGE_ALIGN_UP(size), perm,
-                          NULL);
+    return VirtualProtect(PAGE_ALIGN_DOWN(addr), PAGE_ALIGN_UP(size),
+        perm, NULL);
 #endif
 #if defined(__linux__)
     return mprotect(addr, PAGE_ALIGN_UP(size), perm);

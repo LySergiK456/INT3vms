@@ -2,7 +2,7 @@
 #include "../xtc/xtc.h"
 #include "../common/llist.h"
 #include "../types.h"
-#include "./binary.hh"
+#include "./binary.h"
 #include "./1dlsd.h"
 #include <unicorn/unicorn.h>
 
