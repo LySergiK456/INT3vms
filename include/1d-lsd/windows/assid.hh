@@ -6,8 +6,8 @@
 #include "../../syx86/syx86.hh"
 #include <unicorn/unicorn.h>
 
-#ifndef _1DLSD_LINUX_HH
-#define _1DLSD_LINUX_HH
+#ifndef _1DLSD_WIN_HH
+#define _1DLSD_WIN_HH
 #include "../../../x86disass/disass.hpp"
 #include "../../common/utils.hh"
 #include "../../pe64/pe64.hh"
@@ -25,7 +25,7 @@ struct WLyss : public Lyss {
     Lyss&                   lyss{*dynamic_cast<Lyss*>(this)};
     std::shared_ptr<PE64>   base_pe64;
 
-    WLyss(w1Dlsd *xlsd, std::shared_ptr<PE64> elf);
+    WLyss(w1Dlsd *xlsd, std::shared_ptr<PE64> pe);
 
     __u64 MemConv(Binary_t*, MemConvType, __u64, MemConvType) override;
     __u64 get_size(enum _1DLSD_TYPE t) override;
@@ -43,7 +43,7 @@ public:
         set_lyss(dynamic_cast<Lyss*>(&wlyss));
     }
 
-    void run() override;
+    void run() override {};
 };
 };
 #endif

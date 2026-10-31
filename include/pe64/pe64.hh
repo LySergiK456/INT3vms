@@ -1,12 +1,13 @@
 #ifndef KRACK_PE64_HH
 #define KRACK_PE64_HH
 
-#include "../conf.hh"
 #include <fileapi.h>
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
 #include <winternl.h>
+#include "../1d-lsd/binary.hh"
+#include "../conf.hh"
 #include "../common/utils.hh"
 extern "C" {
     #include "../types.h"
@@ -41,7 +42,7 @@ enum class PE32_FLAGS : __u8 {
     BITS_64 = 64,
 };
 
-struct PE64 {
+struct PE64 : SlitYaX86::Binary_t {
     bool _ok_{false};
     PE32_FLAGS          bits;
     struct {

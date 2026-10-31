@@ -6,13 +6,14 @@ extern "C" {
 	#include "../include/1d-lsd/binary.h"
 };
 
-using SYX = SlitYaX86;
+namespace SYX = SlitYaX86;
+using WLSD = SYX::w1Dlsd;
 
-struct WinObfuscA
+struct WObfuscA
 	: SYX::acid_pass
 {
-    WinObfuscA() = default;
-    LSD_STATUS _init_(XLSD *lsd) {
+    WObfuscA() = default;
+    LSD_STATUS _init_(WLSD *lsd) {
     	puts("+");
     	return LSD_OK;
     }
@@ -20,9 +21,9 @@ struct WinObfuscA
 
 int main() {
 	auto pe = std::make_shared<PE64>(const_cast<char*>("./specimen/b.exe"), PE_SYMTAB_DIR);
-	auto pass = WinObfuscA();
+	auto pass = WObfuscA();
 	// make arg=pass a reference
-	auto lsd = SYX::x1Dlsd(&pass, pe);
+	auto lsd = SYX::w1Dlsd(&pass, pe);
 	// lsd.run();
 	// lsd.make("/tmp/hello.out");
 	return 0;

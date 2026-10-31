@@ -27,6 +27,7 @@ extern "C" {
 namespace SlitYaX86 {
     class _1Dlsd;
     class x1Dlsd;   // Linux packer
+    class w1Dlsd;   // windows
     #if defined(__linux__)
         class ElfObj;
         class XLyss;
@@ -43,7 +44,8 @@ namespace SlitYaX86 {
 struct Lyss {
     struct {
         x1Dlsd  *nix_lsd;
-        _1Dlsd  *____lsd;
+        w1Dlsd  *win_lsd;
+        _1Dlsd  *nan_lsd;
     };
     Binary_t&               bin;
 private:
@@ -55,8 +57,9 @@ public:
     /**
      * Linux    */
     Lyss() = delete;
-    Lyss(_1Dlsd *dlsd, Binary_t& _bin) : ____lsd{dlsd}, bin{_bin} {}
-    Lyss(x1Dlsd *dlsd, Binary_t& _bin) : nix_lsd{dlsd}, bin{_bin} {}
+    Lyss(_1Dlsd *_lsd_, Binary_t& _bin) : nan_lsd{_lsd_}, bin{_bin} {}
+    Lyss(x1Dlsd *_lsd_, Binary_t& _bin) : nix_lsd{_lsd_}, bin{_bin} {}
+    Lyss(w1Dlsd *_lsd_, Binary_t& _bin) : win_lsd{_lsd_}, bin{_bin} {}
     virtual ~Lyss() {
         for (auto& e : tofree) delete e;
     }
