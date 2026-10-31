@@ -26,7 +26,7 @@ namespace SlitYaX86
         
         __u64 dyn_count{};
         __u64 dyn_off = ((__u64)elf->e_usr.dynamic - (__u64)pMem);
-        elfx64_each_dynamic(elf.get(), dyn) {
+        elfx64_each_dynamic(elf, dyn) {
             lyss.push_ptr(
                 bin,
                 ELF_Dyn,
@@ -57,7 +57,7 @@ namespace SlitYaX86
             lyss.push_ptr(
                 bin,
                 static_cast<enum _1DLSD_TYPE>(perms),
-                new_lyss(pMem, ph->p_offset, ALIGN_UP(ph->p_filesz, ph->p_align)));
+                new_lyss(pMem, ph->p_offset, ph->p_filesz));
         }
 
         __u64 sh_ndx{};
@@ -79,7 +79,6 @@ namespace SlitYaX86
                     sec->sh_offset,
                     ALIGN_UP(sec->sh_size, sec->sh_addralign)));
         }
-
     }
 };
 
@@ -160,7 +159,7 @@ void XLyss::align_bin(__u64 off, __u64 sz) {
     // elf.ehdr->e_entry = h.orig_vtov(&elf, elf.ehdr->e_entry);
     lyss.feach(ELF_Dyn, [&](Elf64_Dyn *dyn, void *_) {
         if (dyn_is_ptr(dyn)) {
-            // DBG_FMT("%lx %lx!!!\n", dyn->d_un.d_ptr, lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr));
+            DBG_FMT("%lx %lx!!!\n", dyn->d_un.d_ptr, lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr));
             dyn->d_un.d_ptr =
                 lyss.orig_vtov(dynamic_cast<Binary_t*>(base_elf.get()), dyn->d_un.d_ptr);
         }

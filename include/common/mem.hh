@@ -1,8 +1,10 @@
 #include <string.h>
 #include <assert.h>
-#include "../types.h"
-#include "./utils.h"
-#include "./mem.h"
+extern "C" {
+    #include "../types.h"
+    #include "./utils.h"
+    #include "./mem.h"
+};
 
 #ifndef KRACK_MEM_HH
 #define KRACK_MEM_HH
@@ -21,6 +23,13 @@ struct mem_map_t {
         }
     }
 };
+
+enum class MemConvType : __u8
+{
+    Virt=1,
+    Off =2,
+};
+
 enum MemPerm {
     PAGE_READ,
     PAGE_EXEC,

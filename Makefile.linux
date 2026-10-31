@@ -7,7 +7,8 @@ X86_CFLAGS=	-lx86disass
 UC_CFLAGS =	-lunicorn
 
 objs = linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o
-_1dlsd_objs = core_yayo.o test_linux_1dlsd.o linux_ldr.o self_maps.o yayo.o shellcode.o uc.o elf.o util.o utils.o llist.o rel_1dlsd.o mem.o shadow.o #rel_yayo.o
+vm_objs = linux_main.o linux_ldr.o elf.o utils.o llist.o uc.o mem.o shadow.o self_maps.o
+_1dlsd_objs = core_yayo.o test_linux_1dlsd.o linux_ldr.o self_maps.o yayo.o shellcode.o uc.o elf.o util.o utils.o llist.o rel_1dlsd.o mem.o shadow.o x_assid.o #win_assid.o #rel_yayo.o
 
 CXXFLAGS = -w -g -MMD -MP -lunicorn -lx86disass
 CFLAGS = -w -g -MMD -MP -lunicorn -lx86disass
@@ -43,6 +44,11 @@ run:
 .PHONY: test_1dlsd
 test_1dlsd: make_builddir $(_1dlsd_objs)
 	$(GXX) $(addprefix $(BDIR)/,$(_1dlsd_objs)) $(X86_LDFLAGS) -lx86disass $(UC_LDFLAGS) -lunicorn $(CXXFLAGS) -o syx86
+	./syx86 $(TARGET)
+
+.PHONY: test_vm
+test_vm: make_builddir $(vm_objs)
+	$(GXX) $(addprefix $(BDIR)/,$(vm_objs)) $(X86_LDFLAGS) -lx86disass $(UC_LDFLAGS) -lunicorn $(CXXFLAGS) -o syx86
 	./syx86 $(TARGET)
 
 
@@ -85,6 +91,9 @@ make_builddir:
 	$(GCC) -c $< -o $(BDIR)/$@ $(CFLAGS)
 
 %.o: ./src/1d-lsd/%.cc
+	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(GXXFLAGS)
+
+%.o: ./src/1d-lsd/linux/%.cc
 	$(GXX) -c $< -o $(BDIR)/$@ $(CFLAGS) $(GXXFLAGS)
 
 %.o: ./src/common/%.cc

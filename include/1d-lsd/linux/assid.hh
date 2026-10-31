@@ -20,12 +20,6 @@ extern "C" {
 };
 #include "../1dlsd.hh"
 
-namespace SlitYaX86
-{
-/** Feed this to Lyss::push() **/
-bin_hdr_t *new_lyss(void *ptr, __u64 off, __u64 sz);
-};
-
 namespace SlitYaX86 {
 class x1Dlsd;
 struct XLyss : public Lyss {
@@ -46,7 +40,7 @@ class x1Dlsd : public _1Dlsd {
 public:
     XLyss     xlyss;
     x1Dlsd(acid_pass *_pass, std::shared_ptr<ElfObj> elfptr)
-        :   xlyss(this, elfptr), _1Dlsd(_pass, elfptr)
+        :   xlyss(this, elfptr), _1Dlsd(_pass)
     {
         set_lyss(dynamic_cast<Lyss*>(&xlyss));
     }

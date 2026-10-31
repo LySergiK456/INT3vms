@@ -56,7 +56,7 @@ __u64 Lyss::MemBase(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
     
     for (auto& [lsd_off, emm] : map) {
         if (    emm.src.img == bin
-            &&  !!_contain_(emm.src.off, emm.src.sz, offset))
+            &&  !!_contain_(emm.src.off, emm.mm->sz, offset))
         {
             __u64 ret = lsd_off + (offset - emm.src.off);
             switch (dst_type) {
@@ -65,6 +65,10 @@ __u64 Lyss::MemBase(Binary_t *bin, MT src_type, __u64 value, MT dst_type) {
                 default: assert(0);
             }
         }
+    }
+
+    for (auto& [lsd_off, emm] : map) {
+        DBG_FMT("%lx - - - %lx %lx %lx off=%lx; ok=%lx\n", emm.t, emm.src.off, emm.mm->sz, value, offset, !!_contain_(emm.src.off, emm.mm->sz, offset));
     }
 
     return -1;
@@ -112,6 +116,27 @@ LSD_API void Lyss::push(Binary_t *img, enum _1DLSD_TYPE t, bin_hdr_t& v) {
     for (auto& [off, entry] : map) {
         if (!!_crossed_(entry.dst.off, entry.dst.sz, v.off, v.mm.sz))
         {
+            __u64 min = std::min(entry.dst.off, v.off);
+            __u64 lvl = std::max(entry.dst.off, v.off);
+            __u64 left= lvl + (lvl == v.off ? v.mm.sz : entry.mm->sz);
+            std::vector<__u64> vec{min, lvl, left};
+
+            for (auto& _off_ : vec)
+            {
+                __u64 next{std::max(entry.dst.off + entry.mm->sz, v.off + v.mm.sz)};
+                for (auto& i_off : vec)
+                {
+                    if (i_off > _off_ && i_off < next)
+                        next = i_off;
+                }
+                __u64 size = next - _off_;
+                if (    (_off_ == v.off && v.off < entry.dst.off)
+                    ||  (_off_ >= entry.dst.off + entry.dst.sz
+                        &&  _off_ < v.off + v.mm.sz))
+                {
+                    map[_off_] = *make_entry_extra(img, t, v, _off_, size);
+                }
+            }
             return;
         }
     }
@@ -151,8 +176,10 @@ void Lyss::align_map(__u64 off, __u64 sz) {
     for (auto& [k, emm] : map) {
         if (_contain_(k, emm.mm->sz, off)) {
             out[k].mm->sz += sz;
+            out[k].dst.sz += sz;
         } else if (k >= off) {
             out.erase(k);
+            emm.dst.off = k+sz;
             out[k+sz] = emm;
         }
     }

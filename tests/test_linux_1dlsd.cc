@@ -30,46 +30,46 @@ static char *SC =
 	"\xcc\xcc";
 
 LSD_STATUS ObfuscA::_init_(XLSD *lsd) {
-	auto phdr_st = lsd->lyss->get_by_type(ELF_Phdr, 0);
-	assert(!!phdr_st);
-	lsd->lyss->insert(
-		ELF_Phdr,	// Type
-		(void*)SC,	// The fucking shellcode which shall reide as a Phdr Entry
-		56,			// SizeOf Shellcode
-		phdr_st,	// struct _1Dlsd_entry *
-		0,			// very first of all PHDR's
-		reinterpret_cast<Elf64_Phdr*>(phdr_st->mm->mem)	// Needs the fucking typecasting
-	);
-	// lsd->parse<ELF_Phdr>([&](__u64 off, struct _1Dlsd_entry& e) {
-	// 	auto p = reinterpret_cast<Elf64_Phdr*>(e.mm->mem);
-	// 	switch (p->p_type) {
-	// 	case PT_LOAD:
-	// 	case PT_PHDR:
-	// 	case PT_DYNAMIC:
-	// 	case PT_INTERP:
-	// 	case PT_GNU_PROPERTY:
-	// 	case PT_GNU_EH_FRAME:
-	// 	case PT_GNU_STACK:
-	// 	case PT_GNU_RELRO:		break;
-	// 	default:
-	// 		__u32 perm{};
-	// 		__wr_init(
-	// 			reinterpret_cast<void*>(PAGE_ALIGN_DOWN(p)),
-	// 			PAGE_SIZE,
-	// 			&perm);
+	// auto phdr_st = lsd->lyss->get_by_type(ELF_Phdr, 0);
+	// assert(!!phdr_st);
+	// lsd->lyss->insert(
+	// 	ELF_Phdr,	// Type
+	// 	(void*)SC,	// The fucking shellcode which shall reide as a Phdr Entry
+	// 	56,			// SizeOf Shellcode
+	// 	phdr_st,	// struct _1Dlsd_entry *
+	// 	0,			// very first of all PHDR's
+	// 	reinterpret_cast<Elf64_Phdr*>(phdr_st->mm->mem)	// Needs the fucking typecasting
+	// );
+	lsd->parse<ELF_Phdr>([&](__u64 off, struct _1Dlsd_entry& e) {
+		auto p = reinterpret_cast<Elf64_Phdr*>(e.mm->mem);
+		switch (p->p_type) {
+		case PT_LOAD:
+		case PT_PHDR:
+		case PT_DYNAMIC:
+		case PT_INTERP:
+		case PT_GNU_PROPERTY:
+		case PT_GNU_EH_FRAME:
+		case PT_GNU_STACK:
+		case PT_GNU_RELRO:		break;
+		default:
+			__u32 perm{};
+			__wr_init(
+				reinterpret_cast<void*>(PAGE_ALIGN_DOWN(p)),
+				PAGE_SIZE,
+				&perm);
 
-	// 		p->p_offset	= 0xccccccccdeadbeef;
-	// 		p->p_filesz	= 0xccccccccbeefcafe;
-	// 		p->p_vaddr	= 0xcccccc0ffeadd1c7;
-	// 		p->p_memsz	= 0xacab4deadccccccc;
+			p->p_offset	= 0xccccccccdeadbeef;
+			p->p_filesz	= 0xccccccccbeefcafe;
+			p->p_vaddr	= 0xcccccc0ffeadd1c7;
+			p->p_memsz	= 0xacab4deadccccccc;
 
-	// 		__wr_exit(
-	// 			reinterpret_cast<void*>(PAGE_ALIGN_DOWN(p)),
-	// 			PAGE_SIZE,
-	// 			perm);
-	// 	break;
-	// 	}
-	// });
+			__wr_exit(
+				reinterpret_cast<void*>(PAGE_ALIGN_DOWN(p)),
+				PAGE_SIZE,
+				perm);
+		break;
+		}
+	});
     return LSD_OK;
 }
 

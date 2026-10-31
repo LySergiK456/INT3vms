@@ -142,7 +142,7 @@ perr_t PE64::LoadSymtabFromDir(char *dir) {
     strcat(entry_name, ".dat");
 
     std::ifstream i_stream;
-    i_stream.open(entry_name, std::ifstream::Binary_t | std::ifstream::in);
+    i_stream.open(entry_name, std::ifstream::binary | std::ifstream::in);
     _defer([&i_stream] { i_stream.close(); });
 
     if (!i_stream.good())
@@ -179,7 +179,7 @@ perr_t PE64::SaveSymtab(char *dir) {
     strcat(entry_name, ".dat");
 
     std::ofstream o_stream;
-    o_stream.open(entry_name, std::ofstream::Binary_t | std::ofstream::out);
+    o_stream.open(entry_name, std::ofstream::binary | std::ofstream::out);
     _defer([&o_stream] { o_stream.close(); });
 
     if (!o_stream.good())

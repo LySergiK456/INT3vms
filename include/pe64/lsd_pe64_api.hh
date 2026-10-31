@@ -5,7 +5,7 @@
 #include "../1d-lsd/1dlsd.hh"
 extern "C" {
     #include "../common/mem.h"
-    #include "../1d-lsd/binary."
+    #include "../1d-lsd/binary.h"
     #include "./pe64.h"
 };
 #include "../1d-lsd/binary.h"

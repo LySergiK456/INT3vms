@@ -33,12 +33,10 @@ namespace SlitYaX86 {
     #endif
 };
 
-namespace SlitYaX86 {
-    enum class MemConvType : __u8
-    {
-        Virt=1,
-        Off =2,
-    };
+namespace SlitYaX86
+{
+/** Feed this to Lyss::push() **/
+bin_hdr_t *new_lyss(void *ptr, __u64 off, __u64 sz);
 };
 
 namespace SlitYaX86 {
@@ -71,9 +69,7 @@ public:
     Generic(Fn) int feach(enum _1DLSD_TYPE t, struct _1Dlsd_entry *v, Fn fn) {
         __u64 i{};
         try {
-            for (auto& entry : map) {
-                auto& e = std::get<struct _1Dlsd_entry>(entry);
-
+            for (auto& [_, e] : map) {
                 if (e.t == t && ++i && !!e.mm) {
                     if (!!v) *v = e;
                     for (__u64 off = 0, sz = get_size(t); !!sz && off < e.mm->sz; off += sz) {
@@ -169,7 +165,7 @@ class _1Dlsd : public _1Dlsd_pack_t {
 public: // sorry.. - NO, this is !FUCKED!
     acid_pass       *pass;
     Lyss            *lyss;
-    _1Dlsd(acid_pass *_pass, std::shared_ptr<ElfObj> elfobj)
+    _1Dlsd(acid_pass *_pass)
         : pass{_pass}, _1Dlsd_pack_t{0}
     {
         llist_init(&ll_px,    sizeof(struct _1Dlsd_entry));
